@@ -1,5 +1,5 @@
-#ifndef _NPC_H_
-#define _NPC_H_
+#pragma once
+
 
 #include "vector2d.h"
 
@@ -33,4 +33,4 @@ protected:
 };
 
 
-#endif
+

@@ -1,5 +1,5 @@
-#ifndef _STATE_MINER_H_
-#define _STATE_MINER_H_
+#pragma once
+
 
 #include "state.h"
 #include "miner.h"
@@ -87,4 +87,4 @@ private:
 
 };
 
-#endif
+

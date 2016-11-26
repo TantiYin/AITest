@@ -1,5 +1,5 @@
-#ifndef _ELSA_H_
-#define _ELSA_H_
+#pragma once
+
 
 #include "npc.h"
 #include "stateMachine.h"
@@ -26,4 +26,4 @@ private:
 };
 
 
-#endif
+

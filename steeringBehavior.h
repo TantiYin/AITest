@@ -1,5 +1,5 @@
-#ifndef _STEERING_BEHAVIOR_H_
-#define _STEERING_BEHAVIOR_H_
+#pragma once
+
 
 #include "vector2d.h"
 
@@ -65,4 +65,4 @@ private:
 };
 
 
-#endif
+

@@ -2,7 +2,7 @@
 
 #include <windows.h>
 #include <iostream>
-#include "lua.hpp"
+//#include "lua.hpp"
 
 using namespace std;
 

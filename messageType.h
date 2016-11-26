@@ -1,5 +1,4 @@
-#ifndef MESSAGE_TYPES
-#define MESSAGE_TYPES
+#pragma once
 
 #include <string>
 
@@ -28,4 +27,4 @@ inline std::string MsgToStr(int msg)
 	}
 }
 
-#endif
+

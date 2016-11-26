@@ -1,5 +1,5 @@
-#ifndef _TELEGRAM_H_
-#define _TELEGRAM_H_
+#pragma once
+
 
 #include <stdio.h>
 #include <math.h>
@@ -68,4 +68,4 @@ inline T DereferenceToType(void* p)
 {
 	return *(T*)(p);
 }
-#endif
+

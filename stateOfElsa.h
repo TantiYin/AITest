@@ -1,5 +1,5 @@
-#ifndef _STATE_OF_ELSA_H_
-#define _STATE_OF_ELSA_H_
+#pragma once
+
 
 #include "state.h"
 #include "Elsa.h"
@@ -71,4 +71,4 @@ private:
 
 
 
-#endif
+

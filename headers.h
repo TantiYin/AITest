@@ -1,5 +1,5 @@
-#ifndef _HEADERS_H_
-#define _HEADERS_H_
+#pragma once
+
 
 
 #include "telegram.h"
@@ -22,4 +22,4 @@
 
 #include "vehicle.h"
 
-#endif
+

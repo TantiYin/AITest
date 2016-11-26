@@ -1,5 +1,5 @@
-#ifndef _MOVING_ENTITY_H_
-#define _MOVING_ENTITY_H_
+#pragma once
+
 
 #include "npc.h"
 
@@ -33,4 +33,4 @@ protected:
 
 };
 
-#endif
+

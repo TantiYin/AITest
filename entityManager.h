@@ -3,8 +3,8 @@
 //存储着id到对象的映射
 ////////////////////////////////////////////////////////////////////
 
-#ifndef _ENTITY_MANAGER_H_
-#define _ENTITY_MANAGER_H_
+#pragma once
+
 
 #include "npc.h"
 #include <map>
@@ -25,4 +25,4 @@ public:
 	BaseGameEntity* GetEntityFromID(int id) const;
 	void RemoveEntity(BaseGameEntity* pEntity);
 };
-#endif
+

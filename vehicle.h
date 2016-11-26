@@ -1,5 +1,5 @@
-#ifndef _VEHICLE_H_
-#define _VEHICLE_H_
+#pragma once
+
 
 #include "movingEntity.h"
 class SteeringBehavior;
@@ -20,4 +20,3 @@ private:
 	
 };
 
-#endif

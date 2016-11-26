@@ -1,5 +1,4 @@
-#ifndef NAMES_H
-#define NAMES_H
+#pragma once
 
 #include <string>
 
@@ -30,4 +29,4 @@ inline std::string GetNameOfEntity(int n)
 	}
 }
 
-#endif
+

@@ -3,8 +3,8 @@
 //负责分发消息，接收消息
 ///////////////////////////////////////////////////////////////////////
 
-#ifndef _MESSAGE_DISPATCHER_H_
-#define _MESSAGE_DISPATCHER_H_
+#pragma once
+
 
 #include "npc.h"
 #include "telegram.h"
@@ -29,4 +29,4 @@ public:
 
 
 };
-#endif
+

@@ -1,5 +1,4 @@
-#ifndef LOCATIONS_H
-#define LOCATIONS_H
+#pragma once
 
 
 enum location_type
@@ -19,4 +18,4 @@ enum location_type
 
 
 
-#endif
+

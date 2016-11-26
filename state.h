@@ -1,5 +1,5 @@
-#ifndef _STATE_H_
-#define _STATE_H_
+#pragma once
+
 
 template<class entityType>
 class State
@@ -15,4 +15,4 @@ private:
 
 };
 
-#endif
+

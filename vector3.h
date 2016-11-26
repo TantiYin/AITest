@@ -1,5 +1,5 @@
-#ifndef _VECTOR3_H_
-#define _VECTOR3_H_
+#pragma once
+
 
 class Vector3
 {
@@ -14,4 +14,3 @@ public:
 	double x, y, z;
 
 }
-#endif

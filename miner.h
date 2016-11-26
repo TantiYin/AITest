@@ -1,5 +1,5 @@
-#ifndef _MINER_H_
-#define _MINER_H_
+#pragma once
+
 
 #include "npc.h"
 #include "stateMachine.h"
@@ -49,4 +49,4 @@ private:
 };
 
 
-#endif
+

@@ -1,5 +1,4 @@
-#ifndef _VECTOR_2_H
-#define _VECTOR_2_H
+#pragma once
 
 
 #include <limits>
@@ -171,4 +170,4 @@ inline Vector2 operator/(const Vector2 &lhs, double val)
 
 	return result;
 }
-#endif
+
