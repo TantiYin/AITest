@@ -1,4 +1,6 @@
-#include "headers.h"
+#include "MessageDispatcher.h"
+#include "baseEntity.h"
+#include "entityManager.h"
 #include <time.h>
 
 MessageDispatcher* MessageDispatcher::Instance()

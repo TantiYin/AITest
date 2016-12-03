@@ -1,4 +1,5 @@
-#include "headers.h"
+#include "miner.h"
+#include "stateOfMiner.h"
 
 Miner::Miner(int id, Vector2 pos, double r) :BaseGameEntity(id, pos, r)
 {
@@ -19,11 +20,11 @@ StateMachine<Miner>* Miner::GetFSM()
 	return mFSM;
 }
 
-void Miner::Update()
+void Miner::Update(double t)
 {
 	if (mFSM)
 	{
-		mFSM->Update();
+		mFSM->Update(t);
 	}
 }
 

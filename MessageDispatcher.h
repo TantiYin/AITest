@@ -5,10 +5,10 @@
 
 #pragma once
 
-
-#include "npc.h"
 #include "telegram.h"
 #include <set>
+
+class BaseGameEntity;
 
 class MessageDispatcher
 {

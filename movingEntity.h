@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "npc.h"
+#include "baseEntity.h"
 
 class MovingEntity :public BaseGameEntity
 {

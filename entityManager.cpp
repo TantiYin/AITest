@@ -1,4 +1,5 @@
-#include "headers.h"
+#include "entityManager.h"
+#include "baseEntity.h"
 
 EntityManager* EntityManager::Instance()
 {

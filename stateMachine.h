@@ -18,7 +18,7 @@ public:
 	void SetPreviousState(State<entity_type>* s){ mpPreviousState = s; }
 	void SetGlobalState(State<entity_type>* s){ mpGlobalState = s; }
 	//¸üÐÂFSM
-	void Update() const
+	void Update(double t) const
 	{
 		if (mpGlobalState)
 		{

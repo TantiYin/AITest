@@ -14,7 +14,7 @@ struct  Vector2
 	//set x y to zero
 	void Zero(){ x = 0.0; y = 0.0; }
 	//returns true if both x and y are zero
-	bool isZero()const{ return (x*x + y*y) < std::numeric_limits<double>::min(); }
+	bool isZero()const{ return (x*x + y*y) < (std::numeric_limits<double>::min)();}
 	//returns the length of the vector
 	inline double Length() const;
 	//returns the squared length of the vector (thereby avoiding the sqrt)

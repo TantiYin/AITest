@@ -2,8 +2,9 @@
 
 
 #include "state.h"
-#include "miner.h"
 
+class Miner;
+struct Telegram;
 
 class EnterMineAndDigForGold :public State<Miner>
 {

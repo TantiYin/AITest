@@ -21,8 +21,10 @@ inline std::string GetNameOfEntity(int n)
 	case ent_Elsa:
 
 		return "Elsa";
+
 	case ent_Bus:
 		return "bus";
+
 	default:
 
 		return "UNKNOWN!";

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "npc.h"
+#include "baseEntity.h"
 #include "stateMachine.h"
 
 class Elsa:public BaseGameEntity
@@ -11,7 +11,7 @@ public:
 	~Elsa(){}
 
 	StateMachine<Elsa>* GetFSM();
-	void Update();
+	void Update(double t);
 	bool HandleMessage(const Telegram&);
 
 	void CleanFloor();

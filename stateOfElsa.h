@@ -2,7 +2,8 @@
 
 
 #include "state.h"
-#include "Elsa.h"
+class Elsa;
+struct Telegram;
 
 class CleanHouse:public State<Elsa>
 {

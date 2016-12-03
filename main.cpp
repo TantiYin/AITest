@@ -1,7 +1,10 @@
-#include "headers.h"
-
 #include <windows.h>
 #include <iostream>
+#include "miner.h"
+#include "Elsa.h"
+#include "MessageDispatcher.h"
+#include "entityName.h"
+#include "entityManager.h"
 //#include "lua.hpp"
 
 using namespace std;
@@ -31,24 +34,24 @@ using namespace std;
 
 int main()
 {
-	//Miner *bob = new Miner(ent_Miner_Bob);
-	//EntityManager::Instance()->RegisterEntity(bob);
-	//Elsa *elsa = new Elsa(ent_Elsa);
-	//EntityManager::Instance()->RegisterEntity(elsa);
-	Vehicle *bus = new Vehicle(ent_Bus, Vector2(0, 0), 2, Vector2(0, 10), Vector2(0, 1), 10, 20, 30);
-	
-	cout << "target: 10,100" << endl;
+	Miner *bob = new Miner(ent_Miner_Bob, Vector2(10, 20), 3);
+	EntityManager::Instance()->RegisterEntity(bob);
+	Elsa *elsa = new Elsa(ent_Elsa, Vector2(40, 20), 3);
+	EntityManager::Instance()->RegisterEntity(elsa);
+	//Vehicle *bus = new Vehicle(ent_Bus, Vector2(0, 0), 2, Vector2(0, 10), Vector2(0, 1), 10, 20, 30);
+	//
+	//cout << "target: 10,100" << endl;
 	while (true)
 	{
-		bus->Update(1);
-		cout << GetNameOfEntity(bus->GetID()) << "pos: " << bus->Pos().x << "," << bus->Pos().y << endl;
-		//bob->Update();
-		//cout << " Energy: " << bob->GetEnergy() << " Water: " << bob->GetWater() << " Gold: " << bob->GetGold();
+	//	bus->Update(1);
+	//	cout << GetNameOfEntity(bus->GetID()) << "pos: " << bus->Pos().x << "," << bus->Pos().y << endl;
+		bob->Update(1);
+		cout << " Energy: " << bob->GetEnergy() << " Water: " << bob->GetWater() << " Gold: " << bob->GetGold();
 
-		//elsa->Update();
+		elsa->Update(1);
 
 		//dispatch any delayed messages
-		//MessageDispatcher::Instance()->DispatchDelayedMessage();
+		MessageDispatcher::Instance()->DispatchDelayedMessage();
 		Sleep(1000);
 	}
 	/*lua_State * pL = luaL_newstate();

@@ -1,8 +1,11 @@
 #pragma once
 
 
-#include "npc.h"
+#include "baseEntity.h"
 #include "stateMachine.h"
+#include "locations.h"
+
+struct Telegram;
 
 class Miner :public BaseGameEntity
 {
@@ -11,7 +14,7 @@ public:
 	~Miner();
 
 	StateMachine<Miner>* GetFSM();
-	void Update();
+	void Update(double t);
 	bool HandleMessage(const Telegram&);
 
 	//bool IsInGoldmine();

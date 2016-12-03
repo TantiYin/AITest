@@ -1,4 +1,5 @@
-#include "headers.h"
+#include "elsa.h"
+#include "stateOfElsa.h"
 #include <iostream>
 using namespace std;
 
@@ -14,11 +15,11 @@ StateMachine<Elsa>* Elsa::GetFSM()
 	return mFSM;
 }
 
-void Elsa::Update()
+void Elsa::Update(double t)
 {
 	if (mFSM)
 	{
-		mFSM->Update();
+		mFSM->Update(t);
 	}
 }
 bool Elsa::HandleMessage(const Telegram& msg)

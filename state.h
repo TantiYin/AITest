@@ -1,5 +1,6 @@
 #pragma once
 
+struct Telegram;
 
 template<class entityType>
 class State

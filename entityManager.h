@@ -6,8 +6,9 @@
 #pragma once
 
 
-#include "npc.h"
 #include <map>
+
+class BaseGameEntity;
 
 class EntityManager
 {

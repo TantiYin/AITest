@@ -1,4 +1,9 @@
-#include "headers.h"
+#include "stateOfMiner.h"
+#include "miner.h"
+#include "telegram.h"
+#include "entityName.h"
+#include "MessageDispatcher.h"
+#include "messageType.h"
 #include <iostream>
 using namespace std;
 
