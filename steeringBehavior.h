@@ -13,7 +13,8 @@ public:
 
 	Vector2 Calculate();
 
-
+	void SetTargetPos(const Vector2& TargetPos) {mTargetPos = TargetPos;}
+	Vector2 GetTargetPos() { return mTargetPos; }
 	void SeekOn(){ m_iFlags |= seek; }
 	/* .......................................................
 
@@ -59,6 +60,7 @@ private:
 	Vehicle* mPursuitTarget;
 	Vehicle* mEvadeTarget;
 
+	Vector2 mTargetPos;
 
 	//this function tests if a specific bit of m_iFlags is set
 	bool      On(behavior_type bt){ return (m_iFlags & bt) == bt; }

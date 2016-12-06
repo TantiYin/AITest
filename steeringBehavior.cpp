@@ -21,7 +21,7 @@ Vector2 SteeringBehavior::Calculate()
 	m_vSteeringForce.Zero();
 	if (On(seek))
 	{
-		m_vSteeringForce += Seek(Vector2(10,100)); //* m_dWeightSeek;
+		m_vSteeringForce += Seek(mTargetPos); //* m_dWeightSeek;
 	}
 	return m_vSteeringForce;
 }

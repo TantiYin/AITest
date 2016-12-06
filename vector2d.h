@@ -3,18 +3,16 @@
 
 #include <limits>
 
-
-
 struct  Vector2
 {
 	double x, y;
-	Vector2() :x(0.0), y(0.0){}
-	Vector2(double a, double b) :x(a), y(b){}
+	Vector2(): x(0.0), y(0.0) {}
+	Vector2(double a, double b): x(a), y(b) {}
 
 	//set x y to zero
 	void Zero(){ x = 0.0; y = 0.0; }
 	//returns true if both x and y are zero
-	bool isZero()const{ return (x*x + y*y) < (std::numeric_limits<double>::min)();}
+	bool isZero()const { return (x * x + y * y) < (std::numeric_limits<double>::min)();}
 	//returns the length of the vector
 	inline double Length() const;
 	//returns the squared length of the vector (thereby avoiding the sqrt)
@@ -25,7 +23,7 @@ struct  Vector2
 	inline void      Truncate(double max);
 
 	//we need some overloaded operators
-	const Vector2& operator+=(const Vector2 &rhs)
+	const Vector2& operator+=(const Vector2& rhs)
 	{
 		x += rhs.x;
 		y += rhs.y;
@@ -33,7 +31,7 @@ struct  Vector2
 		return *this;
 	}
 
-	const Vector2& operator-=(const Vector2 &rhs)
+	const Vector2& operator-=(const Vector2& rhs)
 	{
 		x -= rhs.x;
 		y -= rhs.y;
@@ -111,7 +109,7 @@ inline void Vector2::Truncate(double max)
 
 //------------------------------------------------------------------------non member functions
 
-inline Vector2 Vec2DNormalize(const Vector2 &v)
+inline Vector2 Vec2DNormalize(const Vector2& v)
 {
 	Vector2 vec = v;
 
@@ -127,14 +125,14 @@ inline Vector2 Vec2DNormalize(const Vector2 &v)
 }
 
 //------------------------------------------------------------------------operator overloads
-inline Vector2 operator*(const Vector2 &lhs, double rhs)
+inline Vector2 operator*(const Vector2& lhs, double rhs)
 {
 	Vector2 result(lhs);
 	result *= rhs;
 	return result;
 }
 
-inline Vector2 operator*(double lhs, const Vector2 &rhs)
+inline Vector2 operator*(double lhs, const Vector2& rhs)
 {
 	Vector2 result(rhs);
 	result *= lhs;
@@ -142,7 +140,7 @@ inline Vector2 operator*(double lhs, const Vector2 &rhs)
 }
 
 //overload the - operator
-inline Vector2 operator-(const Vector2 &lhs, const Vector2 &rhs)
+inline Vector2 operator-(const Vector2& lhs, const Vector2& rhs)
 {
 	Vector2 result(lhs);
 	result.x -= rhs.x;
@@ -152,7 +150,7 @@ inline Vector2 operator-(const Vector2 &lhs, const Vector2 &rhs)
 }
 
 //overload the + operator
-inline Vector2 operator+(const Vector2 &lhs, const Vector2 &rhs)
+inline Vector2 operator+(const Vector2& lhs, const Vector2& rhs)
 {
 	Vector2 result(lhs);
 	result.x += rhs.x;
@@ -162,7 +160,7 @@ inline Vector2 operator+(const Vector2 &lhs, const Vector2 &rhs)
 }
 
 //overload the / operator
-inline Vector2 operator/(const Vector2 &lhs, double val)
+inline Vector2 operator/(const Vector2& lhs, double val)
 {
 	Vector2 result(lhs);
 	result.x /= val;
