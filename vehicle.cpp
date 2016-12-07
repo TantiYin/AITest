@@ -2,16 +2,20 @@
 #include "steeringBehavior.h"
 #include "d2d1.h"
 #include "transformation.h"
+#include <string>
+#include <sstream>
 
 extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
+extern IDWriteTextFormat* gpTextFormat;
 
 Vehicle::Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce):
 MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world)
 {
 	//set up the steering behavior class
 	mpSteering = new SteeringBehavior(this);
-	mpSteering->SeekOn();
+	//mpSteering->SeekOn();
+	mpSteering->ArriveOn();
 
 	const int NumVehicleVerts = 3;
 
@@ -32,8 +36,8 @@ void Vehicle::Update(double t)
 	//keep a record of its old position so we can update its cell later
 	//in this method
 	Vector2 OldPos = Pos();
-	Vector2 TargetPos = Vector2(50, 100);
-	mpSteering->SetTargetPos(TargetPos);
+	/*Vector2 TargetPos = Vector2(50, 100);
+	mpSteering->SetTargetPos(TargetPos);*/
 
 	Vector2 SteeringForce;
 
@@ -77,14 +81,22 @@ void Vehicle::Render()
 			, D2D1::Point2F(m_vecVehicleVBTrans[i+1].x, m_vecVehicleVBTrans[i+1].y)
 			, gpBrush, 1);
 	}
-
 	gpRenderTarget->DrawLine(D2D1::Point2F(m_vecVehicleVBTrans[VecNum - 1].x, m_vecVehicleVBTrans[VecNum - 1].y)
 		, D2D1::Point2F(m_vecVehicleVBTrans[0].x, m_vecVehicleVBTrans[0].y)
 		, gpBrush, 1);
 
+	//target
 	D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2F(mpSteering->GetTargetPos().x, mpSteering->GetTargetPos().y), mdBoundingRadius, mdBoundingRadius);
 	gpBrush->SetColor(D2D1::ColorF(1.0f, 0.0f, 0.0f));
 	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
+
+	//std::wstringstream ss;
+	//std::wstring str;
+	//ss << L"Ä¿±ê";
+	//ss >> str;
+	////OutputDebugString(str.c_str());
+	//gpRenderTarget->DrawText(str.c_str(), str.size(), gpTextFormat, D2D1::RectF(mpSteering->GetTargetPos().x, mpSteering->GetTargetPos().y
+	//	, mpSteering->GetTargetPos().x + 50, mpSteering->GetTargetPos().y + 20), gpBrush);
 
 	//gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
 	//ellipse = D2D1::Ellipse(D2D1::Point2F(mPos.x, mPos.y), mdBoundingRadius, mdBoundingRadius);

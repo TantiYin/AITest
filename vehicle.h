@@ -17,6 +17,7 @@ public:
 	bool HandleMessage(const Telegram&) { return true; }
 	void Render();
 
+	GameWorld* GetWorld() { return mWorld; }
 private:
 	GameWorld* mWorld;
 

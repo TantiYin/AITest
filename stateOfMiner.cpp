@@ -20,7 +20,7 @@ void EnterMineAndDigForGold::Execute(Miner * target)
 	int n = rand() % 50;
 
 	target->AddGold(n);
-	cout << "\n" << GetNameOfEntity(target->GetID()) << ": pick up" << n << "gold";
+	wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": pick up" << n << L"gold";
 
 	target->LoseEnergy(n);
 	target->LoseWater(n);
@@ -58,7 +58,7 @@ void VisitBankAndDepositGold::Enter(Miner* target)
 void VisitBankAndDepositGold::Execute(Miner* target)
 {
 	target->DepositGold(100);
-	cout << "\n" << GetNameOfEntity(target->GetID()) << ": deposit gold";
+	wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": deposit gold";
 	target->GetFSM()->ChangeState(EnterMineAndDigForGold::Instance());
 	/*if (target->IsThirsty())
 	{
@@ -85,7 +85,7 @@ void GoHomeAndSleepTilRested::Enter(Miner* target)
 	if (target->GetLocation() != shack)
 	{
 		target->ChangeLocation(shack);
-		cout << "\n" << GetNameOfEntity(target->GetID()) << ": honey i'm home";
+		wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": honey i'm home";
 		MessageDispatcher::Instance()->DispatchMessage(0, target->GetID(), ent_Elsa, Msg_HiHoneyImHome, NULL);
 
 	}
@@ -94,7 +94,7 @@ void GoHomeAndSleepTilRested::Enter(Miner* target)
 void GoHomeAndSleepTilRested::Execute(Miner* target)
 {
 	target->Recover();
-	cout << "\n" << GetNameOfEntity(target->GetID()) << ": zzZ";
+	wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": zzZ";
 	if (target->IsFullEnergy())
 	{
 		target->GetFSM()->ChangeState(EnterMineAndDigForGold::Instance());
@@ -115,8 +115,8 @@ bool GoHomeAndSleepTilRested::OnMessage(Miner* target, const Telegram& telegram)
 	{
 	case Msg_StewReady:
 	{
-						  cout << "\n" << GetNameOfEntity(target->GetID()) << ": comming";
-						  target->GetFSM()->ChangeState(EatStew::Instance());
+		wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": comming";
+		target->GetFSM()->ChangeState(EatStew::Instance());
 	}
 		return true;
 	default:
@@ -132,7 +132,7 @@ void QuenchThirst::Enter(Miner*)
 void QuenchThirst::Execute(Miner* target)
 {
 	target->DrinkWater(10);
-	cout << "\n" << GetNameOfEntity(target->GetID()) <<": quench thirsting";
+	wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": quench thirsting";
 	if (target->IsFullWater())
 	{
 		target->GetFSM()->ChangeState(EnterMineAndDigForGold::Instance());
@@ -155,7 +155,7 @@ void EatStew::Enter(Miner*)
 
 void EatStew::Execute(Miner* target)
 {
-	cout << "\n" << GetNameOfEntity(target->GetID()) << ": Tastes real good too!";
+	wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": Tastes real good too!";
 
 	target->GetFSM()->RevertToPreviousState();
 }

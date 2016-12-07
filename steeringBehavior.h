@@ -5,6 +5,15 @@
 
 class Vehicle;
 
+//--------------------------- Constants ----------------------------------
+
+//the radius of the constraining circle for the wander behavior
+const double WanderRad = 1.2;
+//distance the wander circle is projected in front of the agent
+const double WanderDist = 2.0;
+//the maximum amount of displacement along the circle each frame
+const double WanderJitterPerSec = 80.0;
+
 class SteeringBehavior
 {
 public:
@@ -15,7 +24,19 @@ public:
 
 	void SetTargetPos(const Vector2& TargetPos) {mTargetPos = TargetPos;}
 	Vector2 GetTargetPos() { return mTargetPos; }
-	void SeekOn(){ m_iFlags |= seek; }
+
+	void FleeOn() { m_iFlags |= flee; }
+	void SeekOn() { m_iFlags |= seek; }
+	void ArriveOn() { m_iFlags |= arrive; }
+	void WanderOn() { m_iFlags |= wander; }
+
+
+	void FleeOff() { if (On(flee))   m_iFlags ^= flee; }
+	void SeekOff() { if (On(seek))   m_iFlags ^= seek; }
+	void ArriveOff() { if (On(arrive)) m_iFlags ^= arrive; }
+	void WanderOff() { if (On(wander)) m_iFlags ^= wander; }
+
+
 	/* .......................................................
 
 	BEGIN BEHAVIOR DECLARATIONS
@@ -23,6 +44,10 @@ public:
 	.......................................................*/
 	//this behavior moves the agent towards a target position
 	Vector2 Seek(Vector2 TargetPos);
+
+	//this behavior is similar to seek but it attempts to arrive 
+	//at the target position with a zero velocity
+	Vector2 Arrive(Vector2 TargetPos);
 private:
 	enum behavior_type
 	{

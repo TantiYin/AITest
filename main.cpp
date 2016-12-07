@@ -111,8 +111,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			return -1;
 		}
+		RECT rect;
 
-		gWorld = new GameWorld();
+		GetClientRect(hwnd, &rect);
+		gWorld = new GameWorld(rect.right, rect.bottom);
 		return 0;
 	}
 
@@ -175,6 +177,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		}
 		return 0;
+
+	case WM_LBUTTONDOWN:
+	{
+		gWorld->SetCrosshair(MAKEPOINTS(lParam));
+	}
+	break;
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

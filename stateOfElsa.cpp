@@ -62,7 +62,7 @@ void CookStew::Enter(Elsa* target)
 
 void CookStew::Execute(Elsa* target)
 {
-	cout << "\n" << GetNameOfEntity(target->GetID()) << ": cooking...";
+	wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": cooking...";
 }
 
 void CookStew::Exit(Elsa*)
@@ -76,7 +76,7 @@ bool CookStew::OnMessage(Elsa* target, const Telegram& telegram)
 	{
 	case Msg_StewReady:
 	{
-						  cout << "\n" << GetNameOfEntity(target->GetID()) << ": stew ready";
+						  wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": stew ready";
 						  MessageDispatcher::Instance()->DispatchMessage(0, target->GetID(), ent_Miner_Bob, Msg_StewReady, NULL);
 						  target->GetFSM()->ChangeState(CleanHouse::Instance());
 
@@ -112,7 +112,7 @@ bool WifeGlobalState::OnMessage(Elsa* target, const Telegram& telegram)
 	{
 	case Msg_HiHoneyImHome:
 	{
-							  cout << "\n" << GetNameOfEntity(target->GetID()) << ": I will cook stew";
+							  wcout << L"\n" << GetNameOfEntity(target->GetID()) << L": I will cook stew";
 							  target->GetFSM()->ChangeState(CookStew::Instance());
 							
 	} 

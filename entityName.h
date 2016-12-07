@@ -12,27 +12,27 @@ enum
 	ent_Bus,
 };
 
-inline std::string GetNameOfEntity(int n)
+inline std::wstring GetNameOfEntity(int n)
 {
 	BaseGameEntity* Entity = EntityManager::Instance()->GetEntityFromID(n);
 	int EntityType = Entity->GetEntityType();
-	std::stringstream ss;
-	std::string str;
+	std::wstringstream ss;
+	std::wstring str;
 	switch (EntityType)
 	{
 	case ent_Miner_Bob:
-		ss << "Miner Bob " << n;
+		ss << L"Miner Bob " << n;
 		break;
 	case ent_Elsa:
-		ss << "Elsa " << n;
+		ss << L"Elsa " << n;
 		break;
 
 	case ent_Bus:
-		ss << "Bus" << n;
+		ss << L"Bus" << n;
 		break;
 
 	default:
-		ss << "Unknown" << n;
+		ss << L"Unknown" << n;
 		break;
 
 	}
