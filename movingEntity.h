@@ -11,6 +11,7 @@ public:
 		BaseGameEntity(ent_Bus, pos, r),
 		mVelocity(v),
 		mHeading(head),
+		mSide(mHeading.Perp()),
 		mMass(m),
 		mMaxSpeed(maxspeed),
 		mMaxForce(maxforce)
@@ -23,6 +24,12 @@ public:
 
 	double     MaxSpeed()const { return mMaxSpeed; }
 	void      SetMaxSpeed(double newSpeed) { mMaxSpeed = newSpeed; }
+
+	Vector2  Heading()const { return mHeading; }
+	void      SetHeading(Vector2 new_heading);
+
+	Vector2  Side()const { return mSide; }
+
 protected:
 	Vector2 mVelocity;//speed
 	Vector2 mHeading; //heading
@@ -33,5 +40,6 @@ protected:
 	double mMaxForce;	//max force
 
 };
+
 
 

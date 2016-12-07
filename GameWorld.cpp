@@ -7,9 +7,9 @@ extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
 extern IDWriteTextFormat* gpTextFormat;
 
-GameWorld::GameWorld(int x, int y): m_vCrosshair(Vector2(x / 2.0, y / 2.0))
+GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(Vector2(x / 2.0, y / 2.0))
 {
-	mVehicle = new Vehicle(this, Vector2(0, 0), 2, Vector2(0, 10), Vector2(0, 1), 10, 20, 30);
+	mVehicle = new Vehicle(this, Vector2(0, 0), 2, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
 }
 
 GameWorld::~GameWorld()

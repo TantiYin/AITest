@@ -181,3 +181,14 @@ inline Vector2 operator/(const Vector2& lhs, double val)
 	return result;
 }
 
+//treats a window as a toroid
+inline void WrapAround(Vector2& pos, int MaxX, int MaxY)
+{
+	if (pos.x > MaxX) { pos.x = 0.0; }
+
+	if (pos.x < 0) { pos.x = (double)MaxX; }
+
+	if (pos.y < 0) { pos.y = (double)MaxY; }
+
+	if (pos.y > MaxY) { pos.y = 0.0; }
+}

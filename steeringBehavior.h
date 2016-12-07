@@ -8,11 +8,11 @@ class Vehicle;
 //--------------------------- Constants ----------------------------------
 
 //the radius of the constraining circle for the wander behavior
-const double WanderRad = 1.2;
+const double WanderRad = 15;
 //distance the wander circle is projected in front of the agent
-const double WanderDist = 2.0;
+const double WanderDist = 10;
 //the maximum amount of displacement along the circle each frame
-const double WanderJitterPerSec = 80.0;
+const double WanderJitterPerSec = 180.0;
 
 class SteeringBehavior
 {
@@ -48,6 +48,15 @@ public:
 	//this behavior is similar to seek but it attempts to arrive 
 	//at the target position with a zero velocity
 	Vector2 Arrive(Vector2 TargetPos);
+
+	//this behavior makes the agent wander about randomly
+	Vector2 Wander();
+
+
+	Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
+	double GetWanderRadius() { return m_dWanderRadius; }
+	double GetWanderDist() { return m_dWanderDistance; }
+
 private:
 	enum behavior_type
 	{
@@ -86,6 +95,15 @@ private:
 	Vehicle* mEvadeTarget;
 
 	Vector2 mTargetPos;
+
+	//the current position on the wander circle the agent is
+	//attempting to steer towards
+	Vector2     m_vWanderTarget;
+
+	//explained above
+	double        m_dWanderJitter;
+	double        m_dWanderRadius;
+	double        m_dWanderDistance;
 
 	//this function tests if a specific bit of m_iFlags is set
 	bool      On(behavior_type bt){ return (m_iFlags & bt) == bt; }

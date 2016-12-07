@@ -64,3 +64,31 @@ inline std::vector<Vector2> WorldTransform(std::vector<Vector2> &points,
 
 	return TranVector2s;
 }
+
+
+//--------------------- PointToWorldSpace --------------------------------
+//
+//  Transforms a point from the agent's local space into world space
+//------------------------------------------------------------------------
+inline Vector2 PointToWorldSpace(const Vector2 &point,
+	const Vector2 &AgentHeading,
+	const Vector2 &AgentSide,
+	const Vector2 &AgentPosition)
+{
+	//make a copy of the point
+	Vector2 TransPoint = point;
+
+	//create a transformation matrix
+	Matrix2 matTransform;
+
+	//rotate
+	matTransform.Rotate(AgentHeading, AgentSide);
+
+	//and translate
+	matTransform.Translate(AgentPosition.x, AgentPosition.y);
+
+	//now transform the vertices
+	matTransform.TransformVector2s(TransPoint);
+
+	return TransPoint;
+}

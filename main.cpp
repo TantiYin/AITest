@@ -14,6 +14,7 @@
 #include "d2d1.h"
 #include "dwrite.h"
 #include "GameWorld.h"
+#include <ctime>
 //#include "lua.hpp"
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
@@ -58,7 +59,7 @@ HRESULT CreateGraphicsResources(HWND hwnd)
 			const D2D1_COLOR_F color = D2D1::ColorF(0.0f, 0.0f, 1.0f);
 			hr = gpRenderTarget->CreateSolidColorBrush(color, &gpBrush);
 
-			static const WCHAR msc_fontName[] = L"Courier New";//L"Consolas";//L"Verdana";
+			static const WCHAR msc_fontName[] = L"Consolas";//L"Verdana";
 			static const FLOAT msc_fontSize = 15;
 			// Create a DirectWrite text format object.
 			hr = gpWriteFactory->CreateTextFormat(
@@ -111,8 +112,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			return -1;
 		}
-		RECT rect;
 
+		//seed random number generator
+		srand((unsigned)time(NULL));
+
+		RECT rect;
 		GetClientRect(hwnd, &rect);
 		gWorld = new GameWorld(rect.right, rect.bottom);
 		return 0;
@@ -173,6 +177,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetClientRect(hwnd, &rc);
 			D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
 
+			gWorld->SetcxClient(rc.right);
+			gWorld->SetcyClient(rc.bottom);
 			gpRenderTarget->Resize(size);
 
 		}
