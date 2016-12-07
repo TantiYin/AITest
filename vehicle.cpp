@@ -1,6 +1,7 @@
 #include "vehicle.h"
 #include "steeringBehavior.h"
 #include "d2d1.h"
+#include "transformation.h"
 
 extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
@@ -14,9 +15,9 @@ MovingEntity(id, pos, r, v, head, m, maxspeed, maxforce)
 
 	const int NumVehicleVerts = 3;
 
-	Vector2 vehicle[NumVehicleVerts] = { Vector2(-1.0f,0.6f),
-		Vector2(1.0f,0.0f),
-		Vector2(-1.0f,-0.6f) };
+	Vector2 vehicle[NumVehicleVerts] = { Vector2(-10.0f, 6),
+		Vector2(10.0f, 0.0f),
+		Vector2(-10.0f, -6) };
 
 	//setup the vertex buffers and calculate the bounding radius
 	for (int vtx = 0; vtx < NumVehicleVerts; ++vtx)
@@ -51,17 +52,43 @@ void Vehicle::Update(double t)
 
 	//update the position
 	mPos += mVelocity * t;
+
+	//update the heading if the vehicle has a non zero velocity
+	if (mVelocity.LengthSq() > 0.00000001)
+	{
+		mHeading = Vec2DNormalize(mVelocity);
+
+		mSide = mHeading.Perp();
+	}
+
 }
 
 void Vehicle::Render()
 {
+	static std::vector<Vector2>  m_vecVehicleVBTrans;
+
+	m_vecVehicleVBTrans = WorldTransform(mvecVehicleVB, mPos, mHeading, mSide);
+	gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
+
+	int VecNum = m_vecVehicleVBTrans.size();
+	for (int i = 0; i < VecNum - 1; ++i)
+	{
+		gpRenderTarget->DrawLine(D2D1::Point2F(m_vecVehicleVBTrans[i].x, m_vecVehicleVBTrans[i].y)
+			, D2D1::Point2F(m_vecVehicleVBTrans[i+1].x, m_vecVehicleVBTrans[i+1].y)
+			, gpBrush, 1);
+	}
+
+	gpRenderTarget->DrawLine(D2D1::Point2F(m_vecVehicleVBTrans[VecNum - 1].x, m_vecVehicleVBTrans[VecNum - 1].y)
+		, D2D1::Point2F(m_vecVehicleVBTrans[0].x, m_vecVehicleVBTrans[0].y)
+		, gpBrush, 1);
+
 	D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2F(mpSteering->GetTargetPos().x, mpSteering->GetTargetPos().y), mdBoundingRadius, mdBoundingRadius);
 	gpBrush->SetColor(D2D1::ColorF(1.0f, 0.0f, 0.0f));
 	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
 
-	gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
-	ellipse = D2D1::Ellipse(D2D1::Point2F(mPos.x, mPos.y), mdBoundingRadius, mdBoundingRadius);
-	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
+	//gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
+	//ellipse = D2D1::Ellipse(D2D1::Point2F(mPos.x, mPos.y), mdBoundingRadius, mdBoundingRadius);
+	//gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
 
 
 }

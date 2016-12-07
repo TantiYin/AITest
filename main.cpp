@@ -129,8 +129,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				BeginPaint(hwnd, &ps);
 				gpRenderTarget->BeginDraw();
 				gpRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+				gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 0.0f));
+
 				D2D1_SIZE_F size = gpRenderTarget->GetSize();
 				WCHAR LineText[20] = {0};
+				wsprintf(LineText, L"0, 0");
+				gpRenderTarget->DrawText(LineText, ARRAYSIZE(LineText) - 1, gpTextFormat, D2D1::RectF(0, 0, 50, 20), gpBrush);
 				wsprintf(LineText, L"%d, %d", static_cast<int>(size.width), static_cast<int>(size.height));
 				gpRenderTarget->DrawText(LineText, ARRAYSIZE(LineText) - 1, gpTextFormat, D2D1::RectF(size.width - 100, size.height - 20, size.width, size.height), gpBrush);
 

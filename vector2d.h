@@ -19,6 +19,9 @@ struct  Vector2
 	inline double LengthSq() const;
 
 	inline void Normalize();
+
+	//returns the vector that is perpendicular to this one.
+	inline Vector2  Perp()const;
 	//adjusts x and y so that the length of the vector does not exceed max
 	inline void      Truncate(double max);
 
@@ -91,6 +94,15 @@ inline void Vector2::Normalize()
 		this->x /= vector_length;
 		this->y /= vector_length;
 	}
+}
+
+//------------------------------ Perp ------------------------------------
+//
+//  Returns a vector perpendicular to this vector
+//------------------------------------------------------------------------
+inline Vector2 Vector2::Perp()const
+{
+	return Vector2(-y, x);
 }
 
 //----------------------------- Truncate ---------------------------------
