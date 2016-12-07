@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <sstream>
+#include "entityManager.h"
 
 enum
 {
@@ -12,23 +14,30 @@ enum
 
 inline std::string GetNameOfEntity(int n)
 {
-	switch (n)
+	BaseGameEntity* Entity = EntityManager::Instance()->GetEntityFromID(n);
+	int EntityType = Entity->GetEntityType();
+	std::stringstream ss;
+	std::string str;
+	switch (EntityType)
 	{
 	case ent_Miner_Bob:
-
-		return "Miner Bob";
-
+		ss << "Miner Bob " << n;
+		break;
 	case ent_Elsa:
-
-		return "Elsa";
+		ss << "Elsa " << n;
+		break;
 
 	case ent_Bus:
-		return "bus";
+		ss << "Bus" << n;
+		break;
 
 	default:
+		ss << "Unknown" << n;
+		break;
 
-		return "UNKNOWN!";
 	}
+	ss >> str;
+	return str;
 }
 
 

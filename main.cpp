@@ -13,6 +13,7 @@
 #include "PrecisionTimer.h"
 #include "d2d1.h"
 #include "dwrite.h"
+#include "GameWorld.h"
 //#include "lua.hpp"
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
@@ -25,7 +26,8 @@ IDWriteFactory* gpWriteFactory;
 ID2D1HwndRenderTarget* gpRenderTarget;
 ID2D1SolidColorBrush* gpBrush;
 IDWriteTextFormat* gpTextFormat;
-Vehicle* gBus;
+
+GameWorld* gWorld;
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -109,6 +111,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			return -1;
 		}
+
+		gWorld = new GameWorld();
 		return 0;
 	}
 
@@ -120,7 +124,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_PAINT:
 	{
-		if (gBus)
+		if (gWorld)
 		{
 			HRESULT hr = CreateGraphicsResources(hwnd);
 			if (SUCCEEDED(hr))
@@ -147,7 +151,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					gpRenderTarget->DrawLine(D2D1::Point2F(0, y), D2D1::Point2F(size.width, y), gpBrush, 1);
 				}
 
-				gBus->Render();
+				gWorld->Render();
 
 				HRESULT hr = gpRenderTarget->EndDraw();
 				if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET)
@@ -200,8 +204,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 
 	ShowWindow(hWnd, nCmdShow);
 
-	gBus = new Vehicle(ent_Bus, Vector2(0, 0), 2, Vector2(0, 10), Vector2(0, 1), 10, 20, 30);
-
 	MSG msg;
 	bool bDone = false;
 
@@ -228,7 +230,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 		{
 			//update
 			float TimeElapse = Timer.Update();
-			gBus->Update(TimeElapse);
+			gWorld->Update(TimeElapse);
 
 			//render
 			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
@@ -236,7 +238,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 
 	}//end while
 
-	delete gBus;
+	delete gWorld;
 	return 0;
 }
 

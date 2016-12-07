@@ -4,11 +4,12 @@
 #include "movingEntity.h"
 #include <vector>
 class SteeringBehavior;
+class GameWorld;
 
 class Vehicle: public MovingEntity
 {
 public:
-	Vehicle(int id, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce);
+	Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce);
 	
 	~Vehicle() {}
 
@@ -17,6 +18,8 @@ public:
 	void Render();
 
 private:
+	GameWorld* mWorld;
+
 	//the steering behavior class
 	SteeringBehavior*     mpSteering;
 

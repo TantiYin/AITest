@@ -6,8 +6,8 @@
 extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
 
-Vehicle::Vehicle(int id, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce):
-MovingEntity(id, pos, r, v, head, m, maxspeed, maxforce)
+Vehicle::Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce):
+MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world)
 {
 	//set up the steering behavior class
 	mpSteering = new SteeringBehavior(this);

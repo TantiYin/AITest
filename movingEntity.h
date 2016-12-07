@@ -2,12 +2,13 @@
 
 
 #include "baseEntity.h"
+#include "entityName.h"
 
 class MovingEntity: public BaseGameEntity
 {
 public:
-	MovingEntity(int id, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce) :
-		BaseGameEntity(id, pos, r),
+	MovingEntity(Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce) :
+		BaseGameEntity(ent_Bus, pos, r),
 		mVelocity(v),
 		mHeading(head),
 		mMass(m),

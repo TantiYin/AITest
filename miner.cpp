@@ -1,7 +1,7 @@
 #include "miner.h"
 #include "stateOfMiner.h"
 
-Miner::Miner(int id, Vector2 pos, double r) :BaseGameEntity(id, pos, r)
+Miner::Miner(int id, Vector2 pos, double r): BaseGameEntity(id, pos, r)
 {
 	mEnergy = 100;
 	mWater = 100;
