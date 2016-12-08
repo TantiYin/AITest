@@ -92,3 +92,56 @@ inline Vector2 PointToWorldSpace(const Vector2 &point,
 
 	return TransPoint;
 }
+
+
+//--------------------- PointToLocalSpace --------------------------------
+//
+//------------------------------------------------------------------------
+inline Vector2 PointToLocalSpace(const Vector2 &point,
+	Vector2 &AgentHeading,
+	Vector2 &AgentSide,
+	Vector2 &AgentPosition)
+{
+
+	//make a copy of the point
+	Vector2 TransPoint = point;
+
+	//create a transformation matrix
+	Matrix2 matTransform;
+
+	double Tx = -AgentPosition.Dot(AgentHeading);
+	double Ty = -AgentPosition.Dot(AgentSide);
+
+	//create the transformation matrix
+	matTransform._11(AgentHeading.x); matTransform._12(AgentSide.x);
+	matTransform._21(AgentHeading.y); matTransform._22(AgentSide.y);
+	matTransform._31(Tx);           matTransform._32(Ty);
+
+	//now transform the vertices
+	matTransform.TransformVector2s(TransPoint);
+
+	return TransPoint;
+}
+
+//--------------------- VectorToWorldSpace --------------------------------
+//
+//  Transforms a vector from the agent's local space into world space
+//------------------------------------------------------------------------
+inline Vector2 VectorToWorldSpace(const Vector2& vec,
+	const Vector2& AgentHeading,
+	const Vector2& AgentSide)
+{
+	//make a copy of the point
+	Vector2 TransVec = vec;
+
+	//create a transformation matrix
+	Matrix2 matTransform;
+
+	//rotate
+	matTransform.Rotate(AgentHeading, AgentSide);
+
+	//now transform the vertices
+	matTransform.TransformVector2s(TransVec);
+
+	return TransVec;
+}

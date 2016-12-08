@@ -27,6 +27,9 @@ public:
 	double     BRadius()const{ return mdBoundingRadius; }
 	void       SetBRadius(double r){ mdBoundingRadius = r; }
 
+	bool         IsTagged()const { return m_bTag; }
+	void         Tag() { m_bTag = true; }
+	void         UnTag() { m_bTag = false; }
 private:
 	//used by the constructor to give each entity a unique ID
 	int NextValidID() { static int NextID = 0; return NextID++; }
@@ -35,6 +38,8 @@ protected:
 	int mId;//every entity has a unique id
 	int mEntityType;
 	Vector2 mPos;//
+	//this is a generic flag. 
+	bool        m_bTag;
 
 	//the length of this object's bounding radius
 	double    mdBoundingRadius;

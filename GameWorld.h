@@ -2,6 +2,8 @@
 
 #include <windows.h>
 #include "vector2d.h"
+#include "EntityFunction.h"
+#include <vector>
 
 class Vehicle;
 
@@ -9,7 +11,7 @@ class GameWorld
 {
 public:
 	GameWorld(int x, int y);
-	~GameWorld();
+	virtual ~GameWorld();
 
 	void Update(double t);
 	void Render();
@@ -23,8 +25,23 @@ public:
 	void SetcxClient(int x) { m_cxClient = x; }
 	void SetcyClient(int y) { m_cyClient = y; }
 
+	void  TagObstaclesWithinViewRange(BaseGameEntity* pVehicle, double range)
+	{
+		TagNeighbors(pVehicle, m_Obstacles, range);
+	}
+
+	const std::vector<BaseGameEntity*>& Obstacles()const { return m_Obstacles; }
+
+
+private:
+
+	void CreateObstacles();
+
 private:
 	Vehicle* mVehicle;
+
+	//any obstacles
+	std::vector<BaseGameEntity*>  m_Obstacles;
 
 	//the position of the crosshair
 	Vector2                      m_vCrosshair;

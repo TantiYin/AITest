@@ -4,7 +4,7 @@
 #include "baseEntity.h"
 #include "stateMachine.h"
 
-class Elsa:public BaseGameEntity
+class Elsa: public BaseGameEntity
 {
 public:
 	Elsa(int id, Vector2 pos, double r);

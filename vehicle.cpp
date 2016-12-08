@@ -18,6 +18,7 @@ MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world), m_dTimeElap
 	//mpSteering->SeekOn();
 	//mpSteering->ArriveOn();
 	mpSteering->WanderOn();
+	mpSteering->ObstacleAvoidanceOn();
 
 	const int NumVehicleVerts = 3;
 
@@ -83,22 +84,22 @@ void Vehicle::Render()
 	int VecNum = m_vecVehicleVBTrans.size();
 	for (int i = 0; i < VecNum - 1; ++i)
 	{
-		gpRenderTarget->DrawLine(D2D1::Point2F(m_vecVehicleVBTrans[i].x, m_vecVehicleVBTrans[i].y)
-			, D2D1::Point2F(m_vecVehicleVBTrans[i+1].x, m_vecVehicleVBTrans[i+1].y)
+		gpRenderTarget->DrawLine(D2D1::Point2(m_vecVehicleVBTrans[i].x, m_vecVehicleVBTrans[i].y)
+			, D2D1::Point2(m_vecVehicleVBTrans[i+1].x, m_vecVehicleVBTrans[i+1].y)
 			, gpBrush, 1);
 	}
-	gpRenderTarget->DrawLine(D2D1::Point2F(m_vecVehicleVBTrans[VecNum - 1].x, m_vecVehicleVBTrans[VecNum - 1].y)
-		, D2D1::Point2F(m_vecVehicleVBTrans[0].x, m_vecVehicleVBTrans[0].y)
+	gpRenderTarget->DrawLine(D2D1::Point2(m_vecVehicleVBTrans[VecNum - 1].x, m_vecVehicleVBTrans[VecNum - 1].y)
+		, D2D1::Point2(m_vecVehicleVBTrans[0].x, m_vecVehicleVBTrans[0].y)
 		, gpBrush, 1);
 
 	//target
 	Vector2 CircleCenter = Vector2(mpSteering->GetWanderDist(), 0);
 	CircleCenter = PointToWorldSpace(CircleCenter, mHeading, mSide, mPos);
-	D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2F(CircleCenter.x, CircleCenter.y), mpSteering->GetWanderRadius(), mpSteering->GetWanderRadius());
+	D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2(CircleCenter.x, CircleCenter.y), mpSteering->GetWanderRadius(), mpSteering->GetWanderRadius());
 	gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
 	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
 
-	ellipse = D2D1::Ellipse(D2D1::Point2F(mpSteering->GetTargetPos().x, mpSteering->GetTargetPos().y), 2, 2);
+	ellipse = D2D1::Ellipse(D2D1::Point2(mpSteering->GetTargetPos().x, mpSteering->GetTargetPos().y), 2, 2);
 	gpBrush->SetColor(D2D1::ColorF(1.0f, 0.0f, 0.0f));
 	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
 

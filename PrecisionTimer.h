@@ -6,7 +6,7 @@ class CTimer
 {
 public:
 	CTimer();
-	~CTimer() {}
+	virtual ~CTimer() {}
 
 	void Start();
 

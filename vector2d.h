@@ -20,6 +20,8 @@ struct  Vector2
 
 	inline void Normalize();
 
+	inline double    Dot(const Vector2& v2)const;
+
 	//returns the vector that is perpendicular to this one.
 	inline Vector2  Perp()const;
 	//adjusts x and y so that the length of the vector does not exceed max
@@ -94,6 +96,15 @@ inline void Vector2::Normalize()
 		this->x /= vector_length;
 		this->y /= vector_length;
 	}
+}
+
+//------------------------- Vec2DDot -------------------------------------
+//
+//  calculates the dot product
+//------------------------------------------------------------------------
+inline double Vector2::Dot(const Vector2 &v2)const
+{
+	return x*v2.x + y*v2.y;
 }
 
 //------------------------------ Perp ------------------------------------

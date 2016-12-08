@@ -2,6 +2,8 @@
 
 
 #include "vector2d.h"
+#include <vector>
+#include "baseEntity.h"
 
 class Vehicle;
 
@@ -13,12 +15,15 @@ const double WanderRad = 15;
 const double WanderDist = 10;
 //the maximum amount of displacement along the circle each frame
 const double WanderJitterPerSec = 180.0;
+//the min length of detection box
+const double DetectionLength = 20;
+
 
 class SteeringBehavior
 {
 public:
 	SteeringBehavior(Vehicle * target);
-	~SteeringBehavior(){}
+	virtual ~SteeringBehavior(){}
 
 	Vector2 Calculate();
 
@@ -29,13 +34,22 @@ public:
 	void SeekOn() { m_iFlags |= seek; }
 	void ArriveOn() { m_iFlags |= arrive; }
 	void WanderOn() { m_iFlags |= wander; }
+	void ObstacleAvoidanceOn() { m_iFlags |= obstacle_avoidance; }
 
 
 	void FleeOff() { if (On(flee))   m_iFlags ^= flee; }
 	void SeekOff() { if (On(seek))   m_iFlags ^= seek; }
 	void ArriveOff() { if (On(arrive)) m_iFlags ^= arrive; }
 	void WanderOff() { if (On(wander)) m_iFlags ^= wander; }
+	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) m_iFlags ^= obstacle_avoidance; }
 
+	Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
+	double GetWanderRadius() { return m_dWanderRadius; }
+	double GetWanderDist() { return m_dWanderDistance; }
+
+private:
+
+	bool      AccumulateForce(Vector2 &RunningTot, Vector2 ForceToAdd);
 
 	/* .......................................................
 
@@ -53,9 +67,9 @@ public:
 	Vector2 Wander();
 
 
-	Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
-	double GetWanderRadius() { return m_dWanderRadius; }
-	double GetWanderDist() { return m_dWanderDistance; }
+	//this returns a steering force which will attempt to keep the agent 
+	//away from any obstacles it may encounter
+	Vector2 ObstacleAvoidance(const std::vector<BaseGameEntity*>& obstacles);
 
 private:
 	enum behavior_type
@@ -104,6 +118,9 @@ private:
 	double        m_dWanderJitter;
 	double        m_dWanderRadius;
 	double        m_dWanderDistance;
+
+	//length of the 'detection box' utilized in obstacle avoidance
+	double                 m_dDBoxLength;
 
 	//this function tests if a specific bit of m_iFlags is set
 	bool      On(behavior_type bt){ return (m_iFlags & bt) == bt; }
