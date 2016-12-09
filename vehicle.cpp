@@ -22,9 +22,9 @@ MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world), m_dTimeElap
 
 	const int NumVehicleVerts = 3;
 
-	Vector2 vehicle[NumVehicleVerts] = { Vector2(-10.0f, 6),
+	Vector2 vehicle[NumVehicleVerts] = { Vector2(-10.0f, r),
 		Vector2(10.0f, 0.0f),
-		Vector2(-10.0f, -6) };
+		Vector2(-10.0f, -r) };
 
 	//setup the vertex buffers and calculate the bounding radius
 	for (int vtx = 0; vtx < NumVehicleVerts; ++vtx)
@@ -92,17 +92,9 @@ void Vehicle::Render()
 		, D2D1::Point2(m_vecVehicleVBTrans[0].x, m_vecVehicleVBTrans[0].y)
 		, gpBrush, 1);
 
-	//target
-	Vector2 CircleCenter = Vector2(mpSteering->GetWanderDist(), 0);
-	CircleCenter = PointToWorldSpace(CircleCenter, mHeading, mSide, mPos);
-	D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2(CircleCenter.x, CircleCenter.y), mpSteering->GetWanderRadius(), mpSteering->GetWanderRadius());
-	gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
-	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
-
-	ellipse = D2D1::Ellipse(D2D1::Point2(mpSteering->GetTargetPos().x, mpSteering->GetTargetPos().y), 2, 2);
-	gpBrush->SetColor(D2D1::ColorF(1.0f, 0.0f, 0.0f));
-	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
-
+	//操控行为相关
+	mpSteering->Render();
+	
 	//std::wstringstream ss;
 	//std::wstring str;
 	//ss << L"目标";

@@ -10,7 +10,7 @@ extern IDWriteTextFormat* gpTextFormat;
 
 GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(Vector2(x / 2.0, y / 2.0))
 {
-	mVehicle = new Vehicle(this, Vector2(0, 0), 2, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	mVehicle = new Vehicle(this, Vector2(0, 0), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
 
 	CreateObstacles();
 }
@@ -34,10 +34,11 @@ void GameWorld::Render()
 	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
 	gpRenderTarget->DrawLine(D2D1::Point2(m_vCrosshair.x - 8, m_vCrosshair.y), D2D1::Point2(m_vCrosshair.x + 8, m_vCrosshair.y), gpBrush, 1);
 	gpRenderTarget->DrawLine(D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y - 8), D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y + 8), gpBrush, 1);
-	D2D1_SIZE_F size = gpRenderTarget->GetSize();
+	//D2D1_SIZE_F size = gpRenderTarget->GetSize();
 	WCHAR LineText[30] = L"Click to move crosshair";
-	gpRenderTarget->DrawText(LineText, ARRAYSIZE(LineText) - 1, gpTextFormat, D2D1::RectF(5, size.height - 20, size.width, size.height), gpBrush);
+	gpRenderTarget->DrawText(LineText, ARRAYSIZE(LineText) - 1, gpTextFormat, D2D1::RectF(5, cyClient() - 20, cxClient(), cyClient()), gpBrush);
 
+	//ÓÎÏ·¶ÔÏó
 	mVehicle->Render();
 
 	for (const auto& ob : m_Obstacles)
@@ -54,7 +55,7 @@ void GameWorld::SetCrosshair(POINTS p)
 
 void GameWorld::CreateObstacles()
 {
-	const int NumObstacles = 5;
+	const int NumObstacles = 10;
 	const int MinObstacleRadius = 20;
 	const int MaxObstacleRadius = 50;
 

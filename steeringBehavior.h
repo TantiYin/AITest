@@ -25,6 +25,8 @@ public:
 	SteeringBehavior(Vehicle * target);
 	virtual ~SteeringBehavior(){}
 
+	void Render();
+
 	Vector2 Calculate();
 
 	void SetTargetPos(const Vector2& TargetPos) {mTargetPos = TargetPos;}
@@ -43,10 +45,13 @@ public:
 	void WanderOff() { if (On(wander)) m_iFlags ^= wander; }
 	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) m_iFlags ^= obstacle_avoidance; }
 
-	Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
+	//Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
 	double GetWanderRadius() { return m_dWanderRadius; }
 	double GetWanderDist() { return m_dWanderDistance; }
 
+	double GetDLength() { return m_dDBoxLength; }
+	int GetClosetObstacleID() { return ClosestIntersectingObstacle ? ClosestIntersectingObstacle->GetID() : 0; }
+	Vector2 GetClosetObstacleCenter() { return LocalPosOfClosestObstacle; }
 private:
 
 	bool      AccumulateForce(Vector2 &RunningTot, Vector2 ForceToAdd);
@@ -121,6 +126,10 @@ private:
 
 	//length of the 'detection box' utilized in obstacle avoidance
 	double                 m_dDBoxLength;
+	//this will keep track of the closest intersecting obstacle (CIB)
+	BaseGameEntity* ClosestIntersectingObstacle = NULL;
+	//this will record the transformed local coordinates of the CIB
+	Vector2 LocalPosOfClosestObstacle;
 
 	//this function tests if a specific bit of m_iFlags is set
 	bool      On(behavior_type bt){ return (m_iFlags & bt) == bt; }

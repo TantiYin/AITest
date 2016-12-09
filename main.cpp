@@ -139,8 +139,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				BeginPaint(hwnd, &ps);
 				gpRenderTarget->BeginDraw();
 				gpRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
-				gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 0.0f));
+				gpBrush->SetColor(D2D1::ColorF(0.5f, 0.5f, 0.5f));
 
+				//背景网格
 				D2D1_SIZE_F size = gpRenderTarget->GetSize();
 				WCHAR LineText[20] = {0};
 				wsprintf(LineText, L"0, 0");
@@ -150,13 +151,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				for (int x = 0; x < size.width; x += 10)
 				{
-					gpRenderTarget->DrawLine(D2D1::Point2F(x, 0.0f), D2D1::Point2F(x, size.height), gpBrush, 1);
+					gpRenderTarget->DrawLine(D2D1::Point2F(x, 0), D2D1::Point2F(x, size.height), gpBrush, 1);
 				}
 				for (int y = 0; y < size.height; y += 10)
 				{
 					gpRenderTarget->DrawLine(D2D1::Point2F(0, y), D2D1::Point2F(size.width, y), gpBrush, 1);
 				}
 
+				//游戏世界
 				gWorld->Render();
 
 				HRESULT hr = gpRenderTarget->EndDraw();

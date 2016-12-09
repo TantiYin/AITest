@@ -23,3 +23,20 @@ inline double RandFloat() { return ((rand()) / (RAND_MAX + 1.0)); }
 
 //returns a random double in the range -1 < n < 1
 inline double RandomClamped() { return RandFloat() - RandFloat(); }
+
+//clamps the first argument between the second two
+template <class T, class U, class V>
+inline void Clamp(T& arg, const U& minVal, const V& maxVal)
+{
+	assert(((double)minVal < (double)maxVal) && "<Clamp>MaxVal < MinVal!");
+
+	if (arg < (T)minVal)
+	{
+		arg = (T)minVal;
+	}
+
+	if (arg > (T)maxVal)
+	{
+		arg = (T)maxVal;
+	}
+}

@@ -32,7 +32,7 @@ public:
 	void         UnTag() { m_bTag = false; }
 private:
 	//used by the constructor to give each entity a unique ID
-	int NextValidID() { static int NextID = 0; return NextID++; }
+	int NextValidID() { static int NextID = 1; return NextID++; }
 
 protected:
 	int mId;//every entity has a unique id

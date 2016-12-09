@@ -4,6 +4,13 @@
 #include <algorithm>
 #include "utils.h"
 #include "transformation.h"
+#include <d2d1.h>
+#include <string>
+#include <sstream>
+
+extern ID2D1HwndRenderTarget* gpRenderTarget;
+extern ID2D1SolidColorBrush* gpBrush;
+extern IDWriteTextFormat* gpTextFormat;
 
 SteeringBehavior::SteeringBehavior(Vehicle * target) :
 m_pVehicle(target),
@@ -131,13 +138,13 @@ Vector2 SteeringBehavior::ObstacleAvoidance(const std::vector<BaseGameEntity*>& 
 	m_pVehicle->GetWorld()->TagObstaclesWithinViewRange(m_pVehicle, m_dDBoxLength);
 
 	//this will keep track of the closest intersecting obstacle (CIB)
-	BaseGameEntity* ClosestIntersectingObstacle = NULL;
+	ClosestIntersectingObstacle = NULL;
 
 	//this will be used to track the distance to the CIB
 	double DistToClosestIP = MaxDouble;
 
 	//this will record the transformed local coordinates of the CIB
-	Vector2 LocalPosOfClosestObstacle;
+	LocalPosOfClosestObstacle = Vector2(0, 0);
 
 	std::vector<BaseGameEntity*>::const_iterator curOb = obstacles.begin();
 
@@ -210,9 +217,13 @@ Vector2 SteeringBehavior::ObstacleAvoidance(const std::vector<BaseGameEntity*>& 
 			m_dDBoxLength;
 
 		//calculate the lateral force
-		SteeringForce.y = (ClosestIntersectingObstacle->BRadius() -
-			(LocalPosOfClosestObstacle.y))  * multiplier;
+		SteeringForce.y = (ClosestIntersectingObstacle->BRadius() + m_pVehicle->BRadius() - fabs(LocalPosOfClosestObstacle.y))  * multiplier;
 
+		const double Threshold = 0;
+		if (fabs(LocalPosOfClosestObstacle.y) > Threshold)
+		{
+			LocalPosOfClosestObstacle.y > 0 ? SteeringForce.y *= -1 : SteeringForce.y *= 1;
+		}
 		//apply a braking force proportional to the obstacles distance from
 		//the vehicle. 
 		const double BrakingWeight = 0.2;
@@ -226,6 +237,108 @@ Vector2 SteeringBehavior::ObstacleAvoidance(const std::vector<BaseGameEntity*>& 
 	return VectorToWorldSpace(SteeringForce,
 		m_pVehicle->Heading(),
 		m_pVehicle->Side());
+}
+
+//for receiving keyboard input from user
+#define KEYDOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
+
+void SteeringBehavior::Render()
+{
+	{
+
+		if (KEYDOWN(VK_INSERT)) { m_pVehicle->SetMaxForce(m_pVehicle->MaxForce() + 1000.0f*m_pVehicle->TimeElapsed()); }
+		if (KEYDOWN(VK_DELETE)) { if (m_pVehicle->MaxForce() > 0.2f) m_pVehicle->SetMaxForce(m_pVehicle->MaxForce() - 1000.0f*m_pVehicle->TimeElapsed()); }
+		if (KEYDOWN(VK_HOME)) { m_pVehicle->SetMaxSpeed(m_pVehicle->MaxSpeed() + 50.0f*m_pVehicle->TimeElapsed()); }
+		if (KEYDOWN(VK_END)) { if (m_pVehicle->MaxSpeed() > 0.2f) m_pVehicle->SetMaxSpeed(m_pVehicle->MaxSpeed() - 50.0f*m_pVehicle->TimeElapsed()); }
+
+		if (m_pVehicle->MaxForce() < 0) m_pVehicle->SetMaxForce(0.0f);
+		if (m_pVehicle->MaxSpeed() < 0) m_pVehicle->SetMaxSpeed(0.0f);
+
+		std::wstringstream ss;
+		std::wstring LineText;
+
+		ss << L"MaxForce(Ins/Del):" << m_pVehicle->MaxForce();
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat, D2D1::Rect(0, 0, 300, 20), gpBrush);
+		ss.clear();
+		ss << L"MaxSpeed(Home/End):" << m_pVehicle->MaxSpeed();
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat, D2D1::Rect(0, 20, 300, 40), gpBrush);
+	}
+
+
+	if (On(wander))
+	{
+		if (KEYDOWN('F')) { m_dWanderJitter += 1.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderJitter, 0.0f, 100.0f); }
+		if (KEYDOWN('V')) { m_dWanderJitter -= 1.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderJitter, 0.0f, 100.0f); }
+		if (KEYDOWN('G')) { m_dWanderDistance += 2.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderDistance, 0.0f, 50.0f); }
+		if (KEYDOWN('B')) { m_dWanderDistance -= 2.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderDistance, 0.0f, 50.0f); }
+		if (KEYDOWN('H')) { m_dWanderRadius += 2.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderRadius, 0.0f, 100.0f); }
+		if (KEYDOWN('N')) { m_dWanderRadius -= 2.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderRadius, 0.0f, 100.0f); }
+
+		std::wstringstream ss;
+		std::wstring LineText;
+		ss << L"Jitter(F/V):" << m_dWanderJitter;
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat, D2D1::Rect(0, 40, 300, 60), gpBrush);
+		ss.clear();
+		ss << L"Distance(G/B):" << m_dWanderDistance;
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat, D2D1::Rect(0, 60, 300, 80), gpBrush);
+		ss.clear();
+		ss << L"Radius(H/N):" << m_dWanderRadius;
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat, D2D1::Rect(0, 80, 300, 100), gpBrush);
+
+		//wander»¶
+		Vector2 CircleCenter = Vector2(GetWanderDist(), 0);
+		CircleCenter = PointToWorldSpace(CircleCenter, m_pVehicle->Heading(), m_pVehicle->Side(), m_pVehicle->Pos());
+		D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2(CircleCenter.x, CircleCenter.y), GetWanderRadius(), GetWanderRadius());
+		gpBrush->SetColor(D2D1::ColorF(0.0f, 0.0f, 1.0f));
+		gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
+
+		//ƒø±Í
+		ellipse = D2D1::Ellipse(D2D1::Point2(GetTargetPos().x, GetTargetPos().y), 2, 2);
+		gpBrush->SetColor(D2D1::ColorF(1.0f, 0.0f, 0.0f));
+		gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
+	}
+
+	if (On(obstacle_avoidance))
+	{
+		//ºÏ≤‚∫–
+		std::vector<Vector2> DBoxVerticle;
+		DBoxVerticle.push_back(Vector2(0, -1 * m_pVehicle->BRadius()));
+		DBoxVerticle.push_back(Vector2(GetDLength(), -1 * m_pVehicle->BRadius()));
+		DBoxVerticle.push_back(Vector2(GetDLength(), m_pVehicle->BRadius()));
+		DBoxVerticle.push_back(Vector2(0, m_pVehicle->BRadius()));
+
+		std::vector<Vector2> DBoxVerticleTrans = WorldTransform(DBoxVerticle, m_pVehicle->Pos(), m_pVehicle->Heading(), m_pVehicle->Side());
+		int VecNum = DBoxVerticleTrans.size();
+		for (int i = 0; i < VecNum - 1; ++i)
+		{
+			gpRenderTarget->DrawLine(D2D1::Point2(DBoxVerticleTrans[i].x, DBoxVerticleTrans[i].y)
+				, D2D1::Point2(DBoxVerticleTrans[i + 1].x, DBoxVerticleTrans[i + 1].y)
+				, gpBrush, 1);
+		}
+		gpRenderTarget->DrawLine(D2D1::Point2(DBoxVerticleTrans[VecNum - 1].x, DBoxVerticleTrans[VecNum - 1].y)
+			, D2D1::Point2(DBoxVerticleTrans[0].x, DBoxVerticleTrans[0].y)
+			, gpBrush, 1);
+
+		//’œ∞≠ŒÔ
+		std::wstringstream ss;
+		std::wstring LineText;
+		ss << L"closetObstacleID:" << GetClosetObstacleID();
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat
+			, D2D1::Rect(m_pVehicle->GetWorld()->cxClient() - 300, 0, m_pVehicle->GetWorld()->cxClient(), 20)
+			, gpBrush);
+		ss.clear();
+		ss << L"closetObstacleCenter:" << static_cast<int>(GetClosetObstacleCenter().x) << L"," << static_cast<int>(GetClosetObstacleCenter().y);
+		ss >> LineText;
+		gpRenderTarget->DrawText(LineText.c_str(), LineText.size(), gpTextFormat
+			, D2D1::Rect(m_pVehicle->GetWorld()->cxClient() - 300, 20, m_pVehicle->GetWorld()->cxClient(), 40)
+			, gpBrush);
+	}
 }
 
 Vector2 SteeringBehavior::Calculate()
