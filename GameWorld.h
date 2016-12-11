@@ -4,6 +4,7 @@
 #include "vector2d.h"
 #include "EntityFunction.h"
 #include <vector>
+#include "wall2d.h"
 
 class Vehicle;
 
@@ -32,16 +33,23 @@ public:
 
 	const std::vector<BaseGameEntity*>& Obstacles()const { return m_Obstacles; }
 
+    const std::vector<Wall2d>&          Walls(){ return m_Walls; }
+
+
 
 private:
 
 	void CreateObstacles();
+    void CreateWalls();
 
 private:
 	Vehicle* mVehicle;
 
 	//any obstacles
 	std::vector<BaseGameEntity*>  m_Obstacles;
+
+    //container containing any walls in the environment
+    std::vector<Wall2d>           m_Walls;
 
 	//the position of the crosshair
 	Vector2                      m_vCrosshair;

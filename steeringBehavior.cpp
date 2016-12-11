@@ -20,8 +20,9 @@ mTargetPos(Vector2(0, 0)),
 m_dWanderDistance(WanderDist),
 m_dWanderJitter(WanderJitterPerSec),
 m_dWanderRadius(WanderRad),
-m_dDBoxLength(DetectionLength)
-
+m_dDBoxLength(DetectionLength),
+m_Feelers(3),
+m_dWallDetectionFeelerLength(WallDetectionLength)
 {
 
 }
@@ -339,12 +340,27 @@ void SteeringBehavior::Render()
 			, D2D1::Rect(m_pVehicle->GetWorld()->cxClient() - 300, 20, m_pVehicle->GetWorld()->cxClient(), 40)
 			, gpBrush);
 	}
+
+    if (On(wall_avoidance))
+    {
+        std::vector<Vector2> Feelers = WorldTransform(m_Feelers, m_pVehicle->Pos(), m_pVehicle->Heading(), m_pVehicle->Side());
+        for (int i = 0; i < Feelers.size(); ++i)
+        {
+            gpRenderTarget->DrawLine(D2D1::Point2(m_pVehicle->Pos().x, m_pVehicle->Pos().y), D2D1::Point2(Feelers[i].x, Feelers[i].y), gpBrush, 1);
+        }
+    }
 }
 
 Vector2 SteeringBehavior::Calculate()
 {
 	m_vSteeringForce.Zero();
 	Vector2 force;
+
+    if (On(wall_avoidance))
+    {
+        force = WallAvoidance(m_pVehicle->GetWorld()->Walls()) * 20;
+        if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+    }
 
 	if (On(obstacle_avoidance))
 	{
@@ -374,4 +390,80 @@ Vector2 SteeringBehavior::Calculate()
 	m_vSteeringForce.Truncate(m_pVehicle->MaxForce());
 
 	return m_vSteeringForce;
+}
+
+Vector2 SteeringBehavior::WallAvoidance(const std::vector<Wall2d> &walls)
+{
+    //the feelers are contained in a std::vector, m_Feelers
+    CreateFeelers();
+
+    double DistToThisIP = 0.0;
+    double DistToClosestIP = MaxDouble;
+
+    //this will hold an index into the vector of walls
+    int ClosestWall = -1;
+
+    Vector2 SteeringForce,
+        point,         //used for storing temporary info
+        ClosestPoint;  //holds the closest intersection point
+
+    //examine each feeler in turn
+    for (unsigned int flr = 0; flr<m_Feelers.size(); ++flr)
+    {
+        //run through each wall checking for any intersection points
+        for (unsigned int w = 0; w<walls.size(); ++w)
+        {
+            if (LineIntersection2D(m_pVehicle->Pos(),
+                m_Feelers[flr],
+                walls[w].From(),
+                walls[w].To(),
+                DistToThisIP,
+                point))
+            {
+                //is this the closest found so far? If so keep a record
+                if (DistToThisIP < DistToClosestIP)
+                {
+                    DistToClosestIP = DistToThisIP;
+
+                    ClosestWall = w;
+
+                    ClosestPoint = point;
+                }
+            }
+        }//next wall
+
+
+        //if an intersection point has been detected, calculate a force  
+        //that will direct the agent away
+        if (ClosestWall >= 0)
+        {
+            //calculate by what distance the projected position of the agent
+            //will overshoot the wall
+            Vector2 OverShoot = m_Feelers[flr] - ClosestPoint;
+
+            //create a force in the direction of the wall normal, with a 
+            //magnitude of the overshoot
+            SteeringForce = walls[ClosestWall].Normal() * OverShoot.Length();
+        }
+
+    }//next feeler
+
+    return SteeringForce;
+
+}
+
+void SteeringBehavior::CreateFeelers()
+{
+    //feeler pointing straight in front
+    m_Feelers[0] = m_pVehicle->Pos() + m_dWallDetectionFeelerLength * m_pVehicle->Heading();
+
+    //feeler to left
+    Vector2 temp = m_pVehicle->Heading();
+    Vec2DRotateAroundOrigin(temp, HalfPi * 3.5f);
+    m_Feelers[1] = m_pVehicle->Pos() + m_dWallDetectionFeelerLength / 2.0f * temp;
+
+    //feeler to right
+    temp = m_pVehicle->Heading();
+    Vec2DRotateAroundOrigin(temp, HalfPi * 0.5f);
+    m_Feelers[2] = m_pVehicle->Pos() + m_dWallDetectionFeelerLength / 2.0f * temp;
 }

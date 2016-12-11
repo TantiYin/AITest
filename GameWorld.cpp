@@ -13,6 +13,8 @@ GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(V
 	mVehicle = new Vehicle(this, Vector2(0, 0), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
 
 	CreateObstacles();
+    CreateWalls();
+
 }
 
 GameWorld::~GameWorld()
@@ -45,6 +47,10 @@ void GameWorld::Render()
 	{
 		ob->Render();
 	}
+    for (const auto& wall: m_Walls)
+    {
+        wall.Render();
+    }
 }
 
 void GameWorld::SetCrosshair(POINTS p)
@@ -99,4 +105,33 @@ void GameWorld::CreateObstacles()
 			}
 		}
 	}
+}
+
+void GameWorld::CreateWalls()
+{
+    //create the walls  
+    double bordersize = 20.0;
+    double CornerSize = 0.2;
+    double vDist = m_cyClient - 2 * bordersize;
+    double hDist = m_cxClient - 2 * bordersize;
+
+    const int NumWallVerts = 8;
+
+    Vector2 walls[NumWallVerts] = { Vector2(hDist*CornerSize + bordersize, bordersize),
+        Vector2(m_cxClient - bordersize - hDist*CornerSize, bordersize),
+        Vector2(m_cxClient - bordersize, bordersize + vDist*CornerSize),
+        Vector2(m_cxClient - bordersize, m_cyClient - bordersize - vDist*CornerSize),
+
+        Vector2(m_cxClient - bordersize - hDist*CornerSize, m_cyClient - bordersize),
+        Vector2(hDist*CornerSize + bordersize, m_cyClient - bordersize),
+        Vector2(bordersize, m_cyClient - bordersize - vDist*CornerSize),
+        Vector2(bordersize, bordersize + vDist*CornerSize) };
+
+    for (int w = 0; w<NumWallVerts - 1; ++w)
+    {
+        m_Walls.push_back(Wall2d(walls[w], walls[w + 1]));
+    }
+
+    m_Walls.push_back(Wall2d(walls[NumWallVerts - 1], walls[0]));
+
 }

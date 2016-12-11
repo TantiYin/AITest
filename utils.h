@@ -11,6 +11,11 @@ const double  MinDouble = (std::numeric_limits<double>::min)();
 const float   MaxFloat = (std::numeric_limits<float>::max)();
 const float   MinFloat = (std::numeric_limits<float>::min)();
 
+const double   Pi = 3.14159;
+const double   TwoPi = Pi * 2;
+const double   HalfPi = Pi / 2;
+const double   QuarterPi = Pi / 4;
+
 //returns a random integer between x and y
 inline int   RandInt(int x, int y)
 {
@@ -39,4 +44,25 @@ inline void Clamp(T& arg, const U& minVal, const V& maxVal)
 	{
 		arg = (T)maxVal;
 	}
+}
+
+//compares two real numbers. Returns true if they are equal
+inline bool isEqual(float a, float b)
+{
+    if (fabs(a - b) < 1E-12)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+inline bool isEqual(double a, double b)
+{
+    if (fabs(a - b) < 1E-12)
+    {
+        return true;
+    }
+
+    return false;
 }
