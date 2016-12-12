@@ -343,10 +343,9 @@ void SteeringBehavior::Render()
 
     if (On(wall_avoidance))
     {
-        std::vector<Vector2> Feelers = WorldTransform(m_Feelers, m_pVehicle->Pos(), m_pVehicle->Heading(), m_pVehicle->Side());
-        for (int i = 0; i < Feelers.size(); ++i)
+        for (int i = 0; i < m_Feelers.size(); ++i)
         {
-            gpRenderTarget->DrawLine(D2D1::Point2(m_pVehicle->Pos().x, m_pVehicle->Pos().y), D2D1::Point2(Feelers[i].x, Feelers[i].y), gpBrush, 1);
+            gpRenderTarget->DrawLine(D2D1::Point2(m_pVehicle->Pos().x, m_pVehicle->Pos().y), D2D1::Point2(m_Feelers[i].x, m_Feelers[i].y), gpBrush, 1);
         }
     }
 }
