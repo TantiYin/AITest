@@ -8,17 +8,6 @@ class GameWorld;
 
 class Vehicle: public MovingEntity
 {
-public:
-	Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce);
-	
-	~Vehicle() {}
-
-	void Update(double t);
-	bool HandleMessage(const Telegram&) { return true; }
-	void Render();
-
-	GameWorld* GetWorld() { return mWorld; }
-	double       TimeElapsed()const { return m_dTimeElapsed; }
 private:
 	GameWorld* mWorld;
 
@@ -30,5 +19,19 @@ private:
 	double                m_dTimeElapsed;
 
 	std::vector<Vector2> mvecVehicleVB;
+
+public:
+	Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce);
+	
+	~Vehicle() {}
+
+	void Update(double t);
+	bool HandleMessage(const Telegram&) { return true; }
+	void Render();
+
+	//-------------------------------------------accessor methods
+	GameWorld* GetWorld() { return mWorld; }
+	SteeringBehavior*const  Steering()const { return mpSteering; }
+	double       TimeElapsed()const { return m_dTimeElapsed; }
 };
 

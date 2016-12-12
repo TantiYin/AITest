@@ -17,9 +17,10 @@ MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world), m_dTimeElap
 	mpSteering = new SteeringBehavior(this);
 	//mpSteering->SeekOn();
 	//mpSteering->ArriveOn();
-	mpSteering->WanderOn();
+	//mpSteering->WanderOn();
 	//mpSteering->ObstacleAvoidanceOn();
-    mpSteering->WallAvoidanceOn();
+    //mpSteering->WallAvoidanceOn();
+	mpSteering->FollowPathOn();
 
 	const int NumVehicleVerts = 3;
 

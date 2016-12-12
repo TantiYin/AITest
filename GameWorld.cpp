@@ -3,6 +3,7 @@
 #include <d2d1.h>
 #include "utils.h"
 #include "Obstacle.h"
+#include "steeringBehavior.h"
 
 extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
@@ -10,22 +11,26 @@ extern IDWriteTextFormat* gpTextFormat;
 
 GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(Vector2(x / 2.0, y / 2.0))
 {
-	mVehicle = new Vehicle(this, Vector2(0, 0), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	mVehicle = new Vehicle(this, Vector2(m_cxClient / 2, m_cyClient / 2), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
 
 	CreateObstacles();
     CreateWalls();
+
+	double border = 30;
+	m_pPath = new Path(5, border, border, m_cxClient - border, m_cyClient - border, true);
+	mVehicle->Steering()->SetPath(m_pPath->GetPath());
 
 }
 
 GameWorld::~GameWorld()
 {
 	delete mVehicle;
+	delete m_pPath;
 }
 
 void GameWorld::Update(double t)
 {
 	mVehicle->Update(t);
-
 }
 
 void GameWorld::Render()
@@ -51,6 +56,8 @@ void GameWorld::Render()
     {
         wall.Render();
     }
+
+	m_pPath->Render();
 }
 
 void GameWorld::SetCrosshair(POINTS p)

@@ -15,6 +15,6 @@ void Wall2d::CalculateNormal()
 
 void Wall2d::Render() const
 {
-    gpBrush->SetColor(D2D1::ColorF(0.0f, 1.0f, 0.0f));
+    gpBrush->SetColor(D2D1::ColorF(1.0f, 0.0f, 0.0f));
     gpRenderTarget->DrawLine(D2D1::Point2(mA.x, mA.y), D2D1::Point2(mB.x, mB.y), gpBrush, 1);
 }

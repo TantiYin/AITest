@@ -5,6 +5,7 @@
 #include <vector>
 #include "baseEntity.h"
 #include "wall2d.h"
+#include "Path.h"
 
 class Vehicle;
 
@@ -21,6 +22,8 @@ const double DetectionLength = 20;
 //the wall detection length
 const double WallDetectionLength = 20;
 
+//used in path following
+const double WaypointSeekDist = 20;
 
 
 class SteeringBehavior
@@ -58,9 +61,9 @@ private:
     //binary flags to indicate whether or not a behavior should be active
     int           m_iFlags;
 
-    Vehicle* mSeekTarget;
-    Vehicle* mPursuitTarget;
-    Vehicle* mEvadeTarget;
+    //Vehicle* mSeekTarget;
+    //Vehicle* mPursuitTarget;
+    //Vehicle* mEvadeTarget;
 
     Vector2 mTargetPos;
 
@@ -82,9 +85,14 @@ private:
 
     //a vertex buffer to contain the feelers rqd for wall avoidance  
     std::vector<Vector2> m_Feelers;
-
     //the length of the 'feeler/s' used in wall detection
     double                 m_dWallDetectionFeelerLength;
+
+	//pointer to any current path
+	Path*          m_pPath = nullptr;
+	//the distance (squared) a vehicle has to be from a path waypoint before
+	//it starts seeking to the next waypoint
+	double        m_dWaypointSeekDistSq;
 
 private:
 
@@ -120,6 +128,16 @@ private:
     //walls it may encounter
     Vector2 WallAvoidance(const std::vector<Wall2d> &walls);
 
+	//given a series of Vector2Ds, this method produces a force that will
+	//move the agent along the waypoints in order
+	Vector2 FollowPath();
+
+	/* .......................................................
+
+	END BEHAVIOR DECLARATIONS
+
+	.......................................................*/
+
 public:
 	SteeringBehavior(Vehicle * target);
 	virtual ~SteeringBehavior(){}
@@ -137,6 +155,7 @@ public:
 	void WanderOn() { m_iFlags |= wander; }
 	void ObstacleAvoidanceOn() { m_iFlags |= obstacle_avoidance; }
     void WallAvoidanceOn(){ m_iFlags |= wall_avoidance; }
+	void FollowPathOn() { m_iFlags |= follow_path; }
 
 
 	void FleeOff() { if (On(flee))   m_iFlags ^= flee; }
@@ -145,6 +164,7 @@ public:
 	void WanderOff() { if (On(wander)) m_iFlags ^= wander; }
 	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) m_iFlags ^= obstacle_avoidance; }
     void WallAvoidanceOff(){ if (On(wall_avoidance)) m_iFlags ^= wall_avoidance; }
+	void FollowPathOff() { if (On(follow_path)) m_iFlags ^= follow_path; }
 
 	//Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
 	double GetWanderRadius() { return m_dWanderRadius; }
@@ -154,6 +174,8 @@ public:
 	int GetClosetObstacleID() { return ClosestIntersectingObstacle ? ClosestIntersectingObstacle->GetID() : 0; }
 	Vector2 GetClosetObstacleCenter() { return LocalPosOfClosestObstacle; }
 	
+	void      SetPath(std::list<Vector2> new_path) { m_pPath->Set(new_path); }
+
 };
 
 

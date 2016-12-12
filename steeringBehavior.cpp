@@ -22,9 +22,12 @@ m_dWanderJitter(WanderJitterPerSec),
 m_dWanderRadius(WanderRad),
 m_dDBoxLength(DetectionLength),
 m_Feelers(3),
-m_dWallDetectionFeelerLength(WallDetectionLength)
+m_dWallDetectionFeelerLength(WallDetectionLength),
+m_dWaypointSeekDistSq(WaypointSeekDist*WaypointSeekDist)
 {
-
+	//create a Path
+	m_pPath = new Path();
+	m_pPath->LoopOn();
 }
 
 
@@ -385,6 +388,12 @@ Vector2 SteeringBehavior::Calculate()
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
+	if (On(follow_path))
+	{
+		force = FollowPath();
+
+		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+	}
 
 	m_vSteeringForce.Truncate(m_pVehicle->MaxForce());
 
@@ -449,6 +458,27 @@ Vector2 SteeringBehavior::WallAvoidance(const std::vector<Wall2d> &walls)
 
     return SteeringForce;
 
+}
+
+Vector2 SteeringBehavior::FollowPath()
+{
+	//move to next target if close enough to current target (working in
+	//distance squared space)
+	if (Vec2DDistanceSq(m_pPath->CurrentWaypoint(), m_pVehicle->Pos()) <
+		m_dWaypointSeekDistSq)
+	{
+		m_pPath->SetNextWaypoint();
+	}
+
+	if (!m_pPath->Finished())
+	{
+		return Seek(m_pPath->CurrentWaypoint());
+	}
+
+	else
+	{
+		return Arrive(m_pPath->CurrentWaypoint());
+	}
 }
 
 void SteeringBehavior::CreateFeelers()

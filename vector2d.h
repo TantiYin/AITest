@@ -156,6 +156,15 @@ inline double Vec2DDistance(const Vector2 &v1, const Vector2 &v2)
     return sqrt(ySeparation*ySeparation + xSeparation*xSeparation);
 }
 
+inline double Vec2DDistanceSq(const Vector2& v1, const Vector2& v2)
+{
+
+	double ySeparation = v2.y - v1.y;
+	double xSeparation = v2.x - v1.x;
+
+	return ySeparation*ySeparation + xSeparation*xSeparation;
+}
+
 //------------------------------------------------------------------------operator overloads
 inline Vector2 operator*(const Vector2& lhs, double rhs)
 {

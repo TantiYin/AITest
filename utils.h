@@ -16,6 +16,10 @@ const double   TwoPi = Pi * 2;
 const double   HalfPi = Pi / 2;
 const double   QuarterPi = Pi / 4;
 
+//----------------------------------------------------------------------------
+//  some random number functions.
+//----------------------------------------------------------------------------
+
 //returns a random integer between x and y
 inline int   RandInt(int x, int y)
 {
@@ -26,8 +30,14 @@ inline int   RandInt(int x, int y)
 //returns a random double between zero and 1
 inline double RandFloat() { return ((rand()) / (RAND_MAX + 1.0)); }
 
+inline double RandInRange(double x, double y)
+{
+	return x + RandFloat()*(y - x);
+}
+
 //returns a random double in the range -1 < n < 1
 inline double RandomClamped() { return RandFloat() - RandFloat(); }
+
 
 //clamps the first argument between the second two
 template <class T, class U, class V>
