@@ -58,6 +58,9 @@ private:
     //the selected behaviors
     Vector2    m_vSteeringForce;
 
+	//these can be used to keep track of friends, pursuers, or prey
+	Vehicle*     m_pTargetAgent1;
+
     //binary flags to indicate whether or not a behavior should be active
     int           m_iFlags;
 
@@ -112,9 +115,16 @@ private:
     //this behavior moves the agent towards a target position
     Vector2 Seek(Vector2 TargetPos);
 
+	//this behavior returns a vector that moves the agent away
+	//from a target position
+	Vector2 Flee(Vector2 TargetPos);
+
     //this behavior is similar to seek but it attempts to arrive 
     //at the target position with a zero velocity
     Vector2 Arrive(Vector2 TargetPos);
+
+	//this behavior attempts to evade a pursuer
+	Vector2 Evade(const Vehicle* agent);
 
     //this behavior makes the agent wander about randomly
     Vector2 Wander();
@@ -132,11 +142,21 @@ private:
 	//move the agent along the waypoints in order
 	Vector2 FollowPath();
 
+	//given another agent position to hide from and a list of BaseGameEntitys this
+	//method attempts to put an obstacle between itself and its opponent
+	Vector2 Hide(const Vehicle* hunter, const std::vector<BaseGameEntity*>& obstacles);
+
 	/* .......................................................
 
 	END BEHAVIOR DECLARATIONS
 
 	.......................................................*/
+
+	//helper method for Hide. Returns a position located on the other
+	//side of an obstacle to the pursuer
+	Vector2 GetHidingPosition(const Vector2& posOb,
+		const double     radiusOb,
+		const Vector2& posHunter);
 
 public:
 	SteeringBehavior(Vehicle * target);
@@ -156,6 +176,7 @@ public:
 	void ObstacleAvoidanceOn() { m_iFlags |= obstacle_avoidance; }
     void WallAvoidanceOn(){ m_iFlags |= wall_avoidance; }
 	void FollowPathOn() { m_iFlags |= follow_path; }
+	void HideOn(Vehicle* v) { m_iFlags |= hide; m_pTargetAgent1 = v; }
 
 
 	void FleeOff() { if (On(flee))   m_iFlags ^= flee; }
@@ -165,6 +186,7 @@ public:
 	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) m_iFlags ^= obstacle_avoidance; }
     void WallAvoidanceOff(){ if (On(wall_avoidance)) m_iFlags ^= wall_avoidance; }
 	void FollowPathOff() { if (On(follow_path)) m_iFlags ^= follow_path; }
+	void HideOff() { if (On(hide)) m_iFlags ^= hide; }
 
 	//Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
 	double GetWanderRadius() { return m_dWanderRadius; }

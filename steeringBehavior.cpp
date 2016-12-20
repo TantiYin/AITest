@@ -71,6 +71,23 @@ Vector2 SteeringBehavior::Seek(Vector2 TargetPos)
 }
 
 
+Vector2 SteeringBehavior::Flee(Vector2 TargetPos)
+{
+	//only flee if the target is within 'panic distance'. Work in distance
+	//squared space.
+	/* const double PanicDistanceSq = 100.0f * 100.0;
+	if (Vec2DDistanceSq(m_pVehicle->Pos(), target) > PanicDistanceSq)
+	{
+	return Vector2D(0,0);
+	}
+	*/
+
+	Vector2 DesiredVelocity = Vec2DNormalize(m_pVehicle->Pos() - TargetPos)
+		* m_pVehicle->MaxSpeed();
+
+	return (DesiredVelocity - m_pVehicle->Velocity());
+}
+
 Vector2 SteeringBehavior::Arrive(Vector2 TargetPos)
 {
 	Vector2 ToTarget = TargetPos - m_pVehicle->Pos();
@@ -98,6 +115,27 @@ Vector2 SteeringBehavior::Arrive(Vector2 TargetPos)
 	return Vector2(0, 0);
 }
 
+
+Vector2 SteeringBehavior::Evade(const Vehicle* pursuer)
+{
+	/* Not necessary to include the check for facing direction this time */
+
+	Vector2 ToPursuer = pursuer->Pos() - m_pVehicle->Pos();
+
+	//uncomment the following two lines to have Evade only consider pursuers 
+	//within a 'threat range'
+	const double ThreatRange = 100.0;
+	if (ToPursuer.LengthSq() > ThreatRange * ThreatRange) return Vector2();
+
+	//the lookahead time is propotional to the distance between the pursuer
+	//and the pursuer; and is inversely proportional to the sum of the
+	//agents' velocities
+	double LookAheadTime = ToPursuer.Length() /
+		(m_pVehicle->MaxSpeed() + pursuer->Speed());
+
+	//now flee away from predicted future position of the pursuer
+	return Flee(pursuer->Pos() + pursuer->Velocity() * LookAheadTime);
+}
 
 Vector2 SteeringBehavior::Wander()
 {
@@ -395,6 +433,13 @@ Vector2 SteeringBehavior::Calculate()
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
+	if (On(hide))
+	{
+		force = Hide(m_pTargetAgent1, m_pVehicle->GetWorld()->Obstacles());
+
+		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+	}
+
 	m_vSteeringForce.Truncate(m_pVehicle->MaxForce());
 
 	return m_vSteeringForce;
@@ -479,6 +524,63 @@ Vector2 SteeringBehavior::FollowPath()
 	{
 		return Arrive(m_pPath->CurrentWaypoint());
 	}
+}
+
+Vector2 SteeringBehavior::Hide(const Vehicle* hunter, const std::vector<BaseGameEntity*>& obstacles)
+{
+	double    DistToClosest = MaxDouble;
+	Vector2 BestHidingSpot;
+
+	std::vector<BaseGameEntity*>::const_iterator curOb = obstacles.begin();
+	std::vector<BaseGameEntity*>::const_iterator closest;
+
+	while (curOb != obstacles.end())
+	{
+		//calculate the position of the hiding spot for this obstacle
+		Vector2 HidingSpot = GetHidingPosition((*curOb)->Pos(),
+			(*curOb)->BRadius(),
+			hunter->Pos());
+
+		//work in distance-squared space to find the closest hiding
+		//spot to the agent
+		double dist = Vec2DDistanceSq(HidingSpot, m_pVehicle->Pos());
+
+		if (dist < DistToClosest)
+		{
+			DistToClosest = dist;
+
+			BestHidingSpot = HidingSpot;
+
+			closest = curOb;
+		}
+
+		++curOb;
+
+	}//end while
+
+	 //if no suitable obstacles found then Evade the hunter
+	if (DistToClosest == MaxFloat)
+	{
+		return Evade(hunter);
+	}
+
+	//else use Arrive on the hiding spot
+	return Arrive(BestHidingSpot);
+}
+
+Vector2 SteeringBehavior::GetHidingPosition(const Vector2& posOb, const double radiusOb, const Vector2& posHunter)
+{
+	//calculate how far away the agent is to be from the chosen obstacle's
+	//bounding radius
+	const double DistanceFromBoundary = 30.0;
+	double       DistAway = radiusOb + DistanceFromBoundary;
+
+	//calculate the heading toward the object from the hunter
+	Vector2 ToOb = Vec2DNormalize(posOb - posHunter);
+
+	//scale it to size and add to the obstacles position to get
+	//the hiding spot.
+	return (ToOb * DistAway) + posOb;
 }
 
 void SteeringBehavior::CreateFeelers()

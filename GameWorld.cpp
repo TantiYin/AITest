@@ -11,14 +11,19 @@ extern IDWriteTextFormat* gpTextFormat;
 
 GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(Vector2(x / 2.0, y / 2.0))
 {
-	mVehicle = new Vehicle(this, Vector2(m_cxClient / 2, m_cyClient / 2), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
-
 	CreateObstacles();
     CreateWalls();
+	mVehicle = new Vehicle(this, Vector2(m_cxClient / 2, m_cyClient / 2), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	mVehicle->Steering()->WanderOn();
+	mVehicle->Steering()->ObstacleAvoidanceOn();
 
-	double border = 30;
-	m_pPath = new Path(5, border, border, m_cxClient - border, m_cyClient - border, true);
-	mVehicle->Steering()->SetPath(m_pPath->GetPath());
+	mVehicle2 = new Vehicle(this, Vector2(m_cxClient / 2, m_cyClient / 2), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	mVehicle2->Steering()->ObstacleAvoidanceOn();
+	mVehicle2->Steering()->HideOn(mVehicle);
+
+	//double border = 30;
+	//m_pPath = new Path(5, border, border, m_cxClient - border, m_cyClient - border, true);
+	//mVehicle->Steering()->SetPath(m_pPath->GetPath());
 
 }
 
@@ -31,6 +36,7 @@ GameWorld::~GameWorld()
 void GameWorld::Update(double t)
 {
 	mVehicle->Update(t);
+	mVehicle2->Update(t);
 }
 
 void GameWorld::Render()
@@ -47,6 +53,7 @@ void GameWorld::Render()
 
 	//ÓÎÏ·¶ÔÏó
 	mVehicle->Render();
+	mVehicle2->Render();
 
 	for (const auto& ob : m_Obstacles)
 	{
@@ -57,7 +64,10 @@ void GameWorld::Render()
         wall.Render();
     }
 
-	m_pPath->Render();
+	if (m_pPath)
+	{
+		m_pPath->Render();
+	}
 }
 
 void GameWorld::SetCrosshair(POINTS p)

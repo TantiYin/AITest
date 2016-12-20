@@ -19,6 +19,7 @@ private:
 	Vector2                      m_vCrosshair;
 
 	Vehicle* mVehicle;
+	Vehicle* mVehicle2;
 
 	//any obstacles
 	std::vector<BaseGameEntity*>  m_Obstacles;

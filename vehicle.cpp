@@ -20,7 +20,7 @@ MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world), m_dTimeElap
 	//mpSteering->WanderOn();
 	//mpSteering->ObstacleAvoidanceOn();
     //mpSteering->WallAvoidanceOn();
-	mpSteering->FollowPathOn();
+	//mpSteering->FollowPathOn();
 
 	const int NumVehicleVerts = 3;
 
