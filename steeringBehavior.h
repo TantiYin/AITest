@@ -25,9 +25,13 @@ const double WallDetectionLength = 20;
 //used in path following
 const double WaypointSeekDist = 20;
 
+//how far the agent can 'see'
+const double        m_dViewDistance = 50;
+
 
 class SteeringBehavior
 {
+	/* private begin */
 private:
     enum behavior_type
     {
@@ -138,13 +142,21 @@ private:
     //walls it may encounter
     Vector2 WallAvoidance(const std::vector<Wall2d> &walls);
 
-	//given a series of Vector2Ds, this method produces a force that will
+	//given a series of Vector2s, this method produces a force that will
 	//move the agent along the waypoints in order
 	Vector2 FollowPath();
 
 	//given another agent position to hide from and a list of BaseGameEntitys this
 	//method attempts to put an obstacle between itself and its opponent
 	Vector2 Hide(const Vehicle* hunter, const std::vector<BaseGameEntity*>& obstacles);
+
+	// -- Group Behaviors -- //
+
+	Vector2 Cohesion(const std::vector<Vehicle*> &agents);
+
+	Vector2 Separation(const std::vector<Vehicle*> &agents);
+
+	Vector2 Alignment(const std::vector<Vehicle*> &agents);
 
 	/* .......................................................
 
@@ -158,6 +170,9 @@ private:
 		const double     radiusOb,
 		const Vector2& posHunter);
 
+	/* private end */
+
+	/* public begin */
 public:
 	SteeringBehavior(Vehicle * target);
 	virtual ~SteeringBehavior(){}
@@ -169,24 +184,32 @@ public:
 	void SetTargetPos(const Vector2& TargetPos) {mTargetPos = TargetPos;}
 	Vector2 GetTargetPos() { return mTargetPos; }
 
-	void FleeOn() { m_iFlags |= flee; }
 	void SeekOn() { m_iFlags |= seek; }
+	void FleeOn() { m_iFlags |= flee; }
 	void ArriveOn() { m_iFlags |= arrive; }
 	void WanderOn() { m_iFlags |= wander; }
 	void ObstacleAvoidanceOn() { m_iFlags |= obstacle_avoidance; }
     void WallAvoidanceOn(){ m_iFlags |= wall_avoidance; }
 	void FollowPathOn() { m_iFlags |= follow_path; }
 	void HideOn(Vehicle* v) { m_iFlags |= hide; m_pTargetAgent1 = v; }
+	void CohesionOn() { m_iFlags |= cohesion; }
+	void SeparationOn() { m_iFlags |= separation; }
+	void AlignmentOn() { m_iFlags |= allignment; }
+	void FlockingOn() { CohesionOn(); AlignmentOn(); SeparationOn(); WanderOn(); }
 
 
-	void FleeOff() { if (On(flee))   m_iFlags ^= flee; }
 	void SeekOff() { if (On(seek))   m_iFlags ^= seek; }
+	void FleeOff() { if (On(flee))   m_iFlags ^= flee; }
 	void ArriveOff() { if (On(arrive)) m_iFlags ^= arrive; }
 	void WanderOff() { if (On(wander)) m_iFlags ^= wander; }
 	void ObstacleAvoidanceOff() { if (On(obstacle_avoidance)) m_iFlags ^= obstacle_avoidance; }
     void WallAvoidanceOff(){ if (On(wall_avoidance)) m_iFlags ^= wall_avoidance; }
 	void FollowPathOff() { if (On(follow_path)) m_iFlags ^= follow_path; }
 	void HideOff() { if (On(hide)) m_iFlags ^= hide; }
+	void CohesionOff() { if (On(cohesion)) m_iFlags ^= cohesion; }
+	void SeparationOff() { if (On(separation)) m_iFlags ^= separation; }
+	void AlignmentOff() { if (On(allignment)) m_iFlags ^= allignment; }
+	void FlockingOff() { CohesionOff(); AlignmentOff(); SeparationOff(); WanderOff(); }
 
 	//Vector2 GetWanderTargetPos() { return m_vWanderTarget; }
 	double GetWanderRadius() { return m_dWanderRadius; }
@@ -197,7 +220,7 @@ public:
 	Vector2 GetClosetObstacleCenter() { return LocalPosOfClosestObstacle; }
 	
 	void      SetPath(std::list<Vector2> new_path) { m_pPath->Set(new_path); }
-
+	/* public end */
 };
 
 

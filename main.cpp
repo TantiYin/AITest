@@ -188,7 +188,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONDOWN:
 	{
-		gWorld->SetCrosshair(MAKEPOINTS(lParam));
+		if (gWorld->bShowCrosshair)
+		{
+			gWorld->SetCrosshair(MAKEPOINTS(lParam));
+		}
 	}
 	break;
 	}

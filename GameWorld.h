@@ -11,6 +11,7 @@ class Vehicle;
 
 class GameWorld
 {
+	/* private begin */
 private:
 	//local copy of client window dimensions
 	int                           m_cxClient, m_cyClient;
@@ -18,8 +19,7 @@ private:
 	//the position of the crosshair
 	Vector2                      m_vCrosshair;
 
-	Vehicle* mVehicle;
-	Vehicle* mVehicle2;
+	std::vector<Vehicle*> mVehicles;
 
 	//any obstacles
 	std::vector<BaseGameEntity*>  m_Obstacles;
@@ -34,6 +34,15 @@ private:
 
 	void CreateObstacles();
     void CreateWalls();
+	/* private end */
+
+
+	/* public begin */
+public:
+	bool bShowCrosshair = false;
+	bool bShowWall = false;
+	bool bShowObstacle = false;
+	bool bShowPath = false;
 
 public:
 	GameWorld(int x, int y);
@@ -56,8 +65,9 @@ public:
 		TagNeighbors(pVehicle, m_Obstacles, range);
 	}
 
-	const std::vector<BaseGameEntity*>& Obstacles()const { return m_Obstacles; }
-
     const std::vector<Wall2d>&          Walls(){ return m_Walls; }
+	const std::vector<BaseGameEntity*>& Obstacles()const { return m_Obstacles; }
+	const std::vector<Vehicle*>&        Agents() { return mVehicles; }
 
+	/* public end */
 };

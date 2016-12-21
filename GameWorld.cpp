@@ -11,60 +11,107 @@ extern IDWriteTextFormat* gpTextFormat;
 
 GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(Vector2(x / 2.0, y / 2.0))
 {
-	CreateObstacles();
-    CreateWalls();
-	mVehicle = new Vehicle(this, Vector2(m_cxClient / 2, m_cyClient / 2), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
-	mVehicle->Steering()->WanderOn();
-	mVehicle->Steering()->ObstacleAvoidanceOn();
+	if (bShowWall)
+	{
+		CreateWalls();
+	}
+	if (bShowObstacle)
+	{
+		CreateObstacles();
+	}
+	if (bShowPath)
+	{
+		double border = 30;
+		m_pPath = new Path(5, border, border, m_cxClient - border, m_cyClient - border, true);
+	}
 
-	mVehicle2 = new Vehicle(this, Vector2(m_cxClient / 2, m_cyClient / 2), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
-	mVehicle2->Steering()->ObstacleAvoidanceOn();
-	mVehicle2->Steering()->HideOn(mVehicle);
+	Vehicle* TmpVehicle = new Vehicle(this, Vector2(RandInRange(0, x), RandInRange(0, y)), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	TmpVehicle->Steering()->WanderOn();
+	TmpVehicle->Steering()->FlockingOn();
 
-	//double border = 30;
-	//m_pPath = new Path(5, border, border, m_cxClient - border, m_cyClient - border, true);
-	//mVehicle->Steering()->SetPath(m_pPath->GetPath());
+	mVehicles.push_back(TmpVehicle);
 
+	TmpVehicle = new Vehicle(this, Vector2(RandInRange(0, x), RandInRange(0, y)), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	TmpVehicle->Steering()->WanderOn();
+	TmpVehicle->Steering()->FlockingOn();
+
+	mVehicles.push_back(TmpVehicle);
+
+	TmpVehicle = new Vehicle(this, Vector2(RandInRange(0, x), RandInRange(0, y)), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
+	TmpVehicle->Steering()->WanderOn();
+	TmpVehicle->Steering()->FlockingOn();
+
+	mVehicles.push_back(TmpVehicle);
 }
 
 GameWorld::~GameWorld()
 {
-	delete mVehicle;
-	delete m_pPath;
+	for (auto i = 0; i < m_Obstacles.size(); ++i)
+	{
+		delete m_Obstacles[i];
+	}
+
+	for (auto Tmp : mVehicles)
+	{
+		delete Tmp;
+	}
+
+	if (m_pPath != nullptr)
+	{
+		delete m_pPath;
+	}
 }
 
 void GameWorld::Update(double t)
 {
-	mVehicle->Update(t);
-	mVehicle2->Update(t);
+	for (auto i = 0; i < mVehicles.size(); ++i)
+	{
+		mVehicles[i]->Update(t);
+	}
 }
 
 void GameWorld::Render()
 {
-	//and finally the crosshair
-	gpBrush->SetColor(D2D1::ColorF(1.0, 0.0, 0.0));
-	D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y), 4, 4);
-	gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
-	gpRenderTarget->DrawLine(D2D1::Point2(m_vCrosshair.x - 8, m_vCrosshair.y), D2D1::Point2(m_vCrosshair.x + 8, m_vCrosshair.y), gpBrush, 1);
-	gpRenderTarget->DrawLine(D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y - 8), D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y + 8), gpBrush, 1);
-	//D2D1_SIZE_F size = gpRenderTarget->GetSize();
-	WCHAR LineText[30] = L"Click to move crosshair";
-	gpRenderTarget->DrawText(LineText, ARRAYSIZE(LineText) - 1, gpTextFormat, D2D1::RectF(5, cyClient() - 20, cxClient(), cyClient()), gpBrush);
+	//是否绘制准星
+	if (bShowCrosshair)
+	{
+		//and finally the crosshair
+		gpBrush->SetColor(D2D1::ColorF(1.0, 0.0, 0.0));
+		D2D1_ELLIPSE ellipse = D2D1::Ellipse(D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y), 4, 4);
+		gpRenderTarget->DrawEllipse(ellipse, gpBrush, 1);
+		gpRenderTarget->DrawLine(D2D1::Point2(m_vCrosshair.x - 8, m_vCrosshair.y), D2D1::Point2(m_vCrosshair.x + 8, m_vCrosshair.y), gpBrush, 1);
+		gpRenderTarget->DrawLine(D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y - 8), D2D1::Point2(m_vCrosshair.x, m_vCrosshair.y + 8), gpBrush, 1);
+		//D2D1_SIZE_F size = gpRenderTarget->GetSize();
+		WCHAR LineText[30] = L"Click to move crosshair";
+		gpRenderTarget->DrawText(LineText, ARRAYSIZE(LineText) - 1, gpTextFormat, D2D1::RectF(5, cyClient() - 20, cxClient(), cyClient()), gpBrush);
+	}
 
 	//游戏对象
-	mVehicle->Render();
-	mVehicle2->Render();
-
-	for (const auto& ob : m_Obstacles)
+	for (auto i = 0; i < mVehicles.size(); ++i)
 	{
-		ob->Render();
+		mVehicles[i]->Render();
 	}
-    for (const auto& wall: m_Walls)
-    {
-        wall.Render();
-    }
 
-	if (m_pPath)
+	//是否绘制墙
+	if (bShowWall)
+	{
+		for (const auto& wall: m_Walls)
+		{
+			wall.Render();
+		}
+	}
+
+	//是否绘制障碍物
+	if (bShowObstacle)
+	{
+		for (const auto& ob : m_Obstacles)
+		{
+			ob->Render();
+		}
+	}
+
+	//是否绘制路线
+	if (bShowPath)
 	{
 		m_pPath->Render();
 	}

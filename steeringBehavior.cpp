@@ -78,7 +78,7 @@ Vector2 SteeringBehavior::Flee(Vector2 TargetPos)
 	/* const double PanicDistanceSq = 100.0f * 100.0;
 	if (Vec2DDistanceSq(m_pVehicle->Pos(), target) > PanicDistanceSq)
 	{
-	return Vector2D(0,0);
+	return Vector2(0,0);
 	}
 	*/
 
@@ -287,7 +287,6 @@ Vector2 SteeringBehavior::ObstacleAvoidance(const std::vector<BaseGameEntity*>& 
 void SteeringBehavior::Render()
 {
 	{
-
 		if (KEYDOWN(VK_INSERT)) { m_pVehicle->SetMaxForce(m_pVehicle->MaxForce() + 1000.0f*m_pVehicle->TimeElapsed()); }
 		if (KEYDOWN(VK_DELETE)) { if (m_pVehicle->MaxForce() > 0.2f) m_pVehicle->SetMaxForce(m_pVehicle->MaxForce() - 1000.0f*m_pVehicle->TimeElapsed()); }
 		if (KEYDOWN(VK_HOME)) { m_pVehicle->SetMaxSpeed(m_pVehicle->MaxSpeed() + 50.0f*m_pVehicle->TimeElapsed()); }
@@ -396,6 +395,11 @@ Vector2 SteeringBehavior::Calculate()
 	m_vSteeringForce.Zero();
 	Vector2 force;
 
+	if (On(cohesion) || On(separation) || On(allignment))
+	{
+		m_pVehicle->GetWorld()->TagObstaclesWithinViewRange(m_pVehicle, m_dViewDistance);
+	}
+
     if (On(wall_avoidance))
     {
         force = WallAvoidance(m_pVehicle->GetWorld()->Walls()) * 20;
@@ -405,6 +409,27 @@ Vector2 SteeringBehavior::Calculate()
 	if (On(obstacle_avoidance))
 	{
 		force = ObstacleAvoidance(m_pVehicle->GetWorld()->Obstacles()) * 20;
+		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+	}
+
+	if (On(separation))
+	{
+		force = Separation(m_pVehicle->GetWorld()->Agents()) /** m_dWeightSeparation*/;
+
+		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+	}
+
+	if (On(allignment))
+	{
+		force = Alignment(m_pVehicle->GetWorld()->Agents())/* * m_dWeightAlignment*/;
+
+		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+	}
+
+	if (On(cohesion))
+	{
+		force = Cohesion(m_pVehicle->GetWorld()->Agents()) /** m_dWeightCohesion*/;
+
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
@@ -426,13 +451,6 @@ Vector2 SteeringBehavior::Calculate()
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
-	if (On(follow_path))
-	{
-		force = FollowPath();
-
-		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
-	}
-
 	if (On(hide))
 	{
 		force = Hide(m_pTargetAgent1, m_pVehicle->GetWorld()->Obstacles());
@@ -440,7 +458,12 @@ Vector2 SteeringBehavior::Calculate()
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
-	m_vSteeringForce.Truncate(m_pVehicle->MaxForce());
+	if (On(follow_path))
+	{
+		force = FollowPath();
+
+		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+	}
 
 	return m_vSteeringForce;
 }
@@ -566,6 +589,103 @@ Vector2 SteeringBehavior::Hide(const Vehicle* hunter, const std::vector<BaseGame
 
 	//else use Arrive on the hiding spot
 	return Arrive(BestHidingSpot);
+}
+
+Vector2 SteeringBehavior::Cohesion(const std::vector<Vehicle*>& neighbors)
+{
+	//first find the center of mass of all the agents
+	Vector2 CenterOfMass, SteeringForce;
+
+	int NeighborCount = 0;
+
+	//iterate through the neighbors and sum up all the position vectors
+	for (unsigned int a = 0; a < neighbors.size(); ++a)
+	{
+		//make sure *this* agent isn't included in the calculations and that
+		//the agent being examined is close enough ***also make sure it doesn't
+		//include the evade target ***
+		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged() &&
+			(neighbors[a] != m_pTargetAgent1))
+		{
+			CenterOfMass += neighbors[a]->Pos();
+
+			++NeighborCount;
+		}
+	}
+
+	if (NeighborCount > 0)
+	{
+		//the center of mass is the average of the sum of positions
+		CenterOfMass /= (double)NeighborCount;
+
+		//now seek towards that position
+		SteeringForce = Seek(CenterOfMass);
+	}
+
+	//the magnitude of cohesion is usually much larger than separation or
+	//allignment so it usually helps to normalize it.
+	return Vec2DNormalize(SteeringForce);
+
+}
+
+Vector2 SteeringBehavior::Separation(const std::vector<Vehicle*>& neighbors)
+{
+	Vector2 SteeringForce;
+
+	for (unsigned int a = 0; a < neighbors.size(); ++a)
+	{
+		//make sure this agent isn't included in the calculations and that
+		//the agent being examined is close enough. ***also make sure it doesn't
+		//include the evade target ***
+		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged() &&
+			(neighbors[a] != m_pTargetAgent1))
+		{
+			Vector2 ToAgent = m_pVehicle->Pos() - neighbors[a]->Pos();
+
+			//scale the force inversely proportional to the agents distance  
+			//from its neighbor.
+			SteeringForce += Vec2DNormalize(ToAgent) / ToAgent.Length();
+		}
+	}
+
+	return SteeringForce;
+
+}
+
+Vector2 SteeringBehavior::Alignment(const std::vector<Vehicle*>& neighbors)
+{
+	//used to record the average heading of the neighbors
+	Vector2 AverageHeading;
+
+	//used to count the number of vehicles in the neighborhood
+	int    NeighborCount = 0;
+
+	//iterate through all the tagged vehicles and sum their heading vectors  
+	for (unsigned int a = 0; a < neighbors.size(); ++a)
+	{
+		//make sure *this* agent isn't included in the calculations and that
+		//the agent being examined  is close enough ***also make sure it doesn't
+		//include any evade target ***
+		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged() &&
+			(neighbors[a] != m_pTargetAgent1))
+		{
+			AverageHeading += neighbors[a]->Heading();
+
+			++NeighborCount;
+		}
+	}
+
+	//if the neighborhood contained one or more vehicles, average their
+	//heading vectors.
+	if (NeighborCount > 0)
+	{
+		AverageHeading /= (double)NeighborCount;
+
+		AverageHeading -= m_pVehicle->Heading();
+	}
+
+	return AverageHeading;
+
 }
 
 Vector2 SteeringBehavior::GetHidingPosition(const Vector2& posOb, const double radiusOb, const Vector2& posHunter)
