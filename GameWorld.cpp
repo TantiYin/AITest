@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "Obstacle.h"
 #include "steeringBehavior.h"
+#include "ParamLoader.h"
 
 extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
@@ -25,23 +26,28 @@ GameWorld::GameWorld(int x, int y): m_cxClient(x), m_cyClient(y), m_vCrosshair(V
 		m_pPath = new Path(5, border, border, m_cxClient - border, m_cyClient - border, true);
 	}
 
-	Vehicle* TmpVehicle = new Vehicle(this, Vector2(RandInRange(0, x), RandInRange(0, y)), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
-	TmpVehicle->Steering()->WanderOn();
-	TmpVehicle->Steering()->FlockingOn();
+	//setup the agents
+	for (int a = 0; a < Prm.NumAgents; ++a)
+	{
 
-	mVehicles.push_back(TmpVehicle);
+		//determine a random starting position
+		Vector2 SpawnPos = Vector2(m_cxClient / 2.0 + RandomClamped()*m_cxClient / 2.0,
+			m_cyClient / 2.0 + RandomClamped()*m_cyClient / 2.0);
 
-	TmpVehicle = new Vehicle(this, Vector2(RandInRange(0, x), RandInRange(0, y)), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
-	TmpVehicle->Steering()->WanderOn();
-	TmpVehicle->Steering()->FlockingOn();
+		double deg = RandFloat() * TwoPi;
+		Vehicle* pVehicle = new Vehicle(this,
+			SpawnPos,                 //initial position
+			Vector2(sin(deg), -cos(deg)),        //start rotation
+			Vector2(0, 0),            //velocity
+			Prm.VehicleMass,          //mass
+			Prm.MaxSpeed,             //max velocity
+			Prm.MaxSteeringForce,     //max force
+			Prm.VehicleScale);        //scale
 
-	mVehicles.push_back(TmpVehicle);
+		pVehicle->Steering()->FlockingOn();
 
-	TmpVehicle = new Vehicle(this, Vector2(RandInRange(0, x), RandInRange(0, y)), 6, Vector2(0, 10), Vector2(0, 1), 2, 50, 100);
-	TmpVehicle->Steering()->WanderOn();
-	TmpVehicle->Steering()->FlockingOn();
-
-	mVehicles.push_back(TmpVehicle);
+		mVehicles.push_back(pVehicle);
+	}
 }
 
 GameWorld::~GameWorld()

@@ -7,10 +7,10 @@
 class MovingEntity: public BaseGameEntity
 {
 public:
-	MovingEntity(Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce) :
-		BaseGameEntity(ent_Bus, pos, r),
+	MovingEntity(Vector2 pos, Vector2 rot, Vector2 v, double m, double maxspeed, double maxforce, double scale) :
+		BaseGameEntity(ent_Bus, pos, scale),
 		mVelocity(v),
-		mHeading(head),
+		mHeading(rot),
 		mSide(mHeading.Perp()),
 		mMass(m),
 		mMaxSpeed(maxspeed),

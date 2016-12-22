@@ -21,7 +21,7 @@ private:
 	std::vector<Vector2> mvecVehicleVB;
 
 public:
-	Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce);
+	Vehicle(GameWorld* world, Vector2 pos, Vector2 rot, Vector2 v, double m, double maxspeed, double maxforce, double scale);
 	
 	~Vehicle() {}
 

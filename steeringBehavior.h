@@ -17,16 +17,11 @@ const double WanderRad = 15;
 const double WanderDist = 10;
 //the maximum amount of displacement along the circle each frame
 const double WanderJitterPerSec = 180.0;
-//the min length of detection box
-const double DetectionLength = 20;
-//the wall detection length
-const double WallDetectionLength = 20;
+
 
 //used in path following
 const double WaypointSeekDist = 20;
 
-//how far the agent can 'see'
-const double        m_dViewDistance = 50;
 
 
 class SteeringBehavior
@@ -100,6 +95,29 @@ private:
 	//the distance (squared) a vehicle has to be from a path waypoint before
 	//it starts seeking to the next waypoint
 	double        m_dWaypointSeekDistSq;
+
+
+	//multipliers. These can be adjusted to effect strength of the  
+	//appropriate behavior. Useful to get flocking the way you require
+	//for example.
+	double        m_dWeightSeparation;
+	double        m_dWeightCohesion;
+	double        m_dWeightAlignment;
+	double        m_dWeightWander;
+	double        m_dWeightObstacleAvoidance;
+	double        m_dWeightWallAvoidance;
+	double        m_dWeightSeek;
+	double        m_dWeightFlee;
+	double        m_dWeightArrive;
+	double        m_dWeightPursuit;
+	double        m_dWeightOffsetPursuit;
+	double        m_dWeightInterpose;
+	double        m_dWeightHide;
+	double        m_dWeightEvade;
+	double        m_dWeightFollowPath;
+
+	//how far the agent can 'see'
+	double        m_dViewDistance;
 
 private:
 

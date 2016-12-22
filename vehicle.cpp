@@ -10,23 +10,17 @@ extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
 extern IDWriteTextFormat* gpTextFormat;
 
-Vehicle::Vehicle(GameWorld* world, Vector2 pos, double r, Vector2 v, Vector2 head, double m, double maxspeed, double maxforce):
-MovingEntity(pos, r, v, head, m, maxspeed, maxforce), mWorld(world), m_dTimeElapsed(0)
+Vehicle::Vehicle(GameWorld* world, Vector2 pos, Vector2 rot, Vector2 v, double m, double maxspeed, double maxforce, double scale):
+MovingEntity(pos, rot, v, m, maxspeed, maxforce, scale), mWorld(world), m_dTimeElapsed(0)
 {
 	//set up the steering behavior class
 	mpSteering = new SteeringBehavior(this);
-	//mpSteering->SeekOn();
-	//mpSteering->ArriveOn();
-	//mpSteering->WanderOn();
-	//mpSteering->ObstacleAvoidanceOn();
-    //mpSteering->WallAvoidanceOn();
-	//mpSteering->FollowPathOn();
 
 	const int NumVehicleVerts = 3;
 
-	Vector2 vehicle[NumVehicleVerts] = { Vector2(-10.0f, r),
-		Vector2(10.0f, 0.0f),
-		Vector2(-10.0f, -r) };
+	Vector2 vehicle[NumVehicleVerts] = { Vector2(-scale, scale * 3/5),
+		Vector2(scale, 0.0f),
+		Vector2(-scale, -scale * 3/5) };
 
 	//setup the vertex buffers and calculate the bounding radius
 	for (int vtx = 0; vtx < NumVehicleVerts; ++vtx)

@@ -60,6 +60,11 @@ public:
 	Vector2    Crosshair()const { return m_vCrosshair; }
 	void        SetCrosshair(POINTS p);
 
+	void  TagVehiclesWithinViewRange(BaseGameEntity* pVehicle, double range)
+	{
+		TagNeighbors(pVehicle, mVehicles, range);
+	}
+
 	void  TagObstaclesWithinViewRange(BaseGameEntity* pVehicle, double range)
 	{
 		TagNeighbors(pVehicle, m_Obstacles, range);

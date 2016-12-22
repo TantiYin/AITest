@@ -7,6 +7,7 @@
 #include <d2d1.h>
 #include <string>
 #include <sstream>
+#include "ParamLoader.h"
 
 extern ID2D1HwndRenderTarget* gpRenderTarget;
 extern ID2D1SolidColorBrush* gpBrush;
@@ -20,10 +21,26 @@ mTargetPos(Vector2(0, 0)),
 m_dWanderDistance(WanderDist),
 m_dWanderJitter(WanderJitterPerSec),
 m_dWanderRadius(WanderRad),
-m_dDBoxLength(DetectionLength),
+m_dDBoxLength(Prm.MinDetectionBoxLength),
+m_dViewDistance(Prm.ViewDistance),
 m_Feelers(3),
-m_dWallDetectionFeelerLength(WallDetectionLength),
-m_dWaypointSeekDistSq(WaypointSeekDist*WaypointSeekDist)
+m_dWallDetectionFeelerLength(Prm.WallDetectionFeelerLength),
+m_dWaypointSeekDistSq(WaypointSeekDist*WaypointSeekDist),
+m_dWeightSeek(Prm.SeekWeight),
+m_dWeightFlee(Prm.FleeWeight),
+m_dWeightArrive(Prm.ArriveWeight),
+m_dWeightWander(Prm.WanderWeight),
+m_dWeightPursuit(Prm.PursuitWeight),
+m_dWeightOffsetPursuit(Prm.OffsetPursuitWeight),
+m_dWeightInterpose(Prm.InterposeWeight),
+m_dWeightHide(Prm.HideWeight),
+m_dWeightEvade(Prm.EvadeWeight),
+m_dWeightFollowPath(Prm.FollowPathWeight),
+m_dWeightCohesion(Prm.CohesionWeight),
+m_dWeightAlignment(Prm.AlignmentWeight),
+m_dWeightSeparation(Prm.SeparationWeight),
+m_dWeightObstacleAvoidance(Prm.ObstacleAvoidanceWeight),
+m_dWeightWallAvoidance(Prm.WallAvoidanceWeight)
 {
 	//create a Path
 	m_pPath = new Path();
@@ -172,9 +189,9 @@ Vector2 SteeringBehavior::Wander()
 Vector2 SteeringBehavior::ObstacleAvoidance(const std::vector<BaseGameEntity*>& obstacles)
 {
 	//the detection box length is proportional to the agent's velocity
-	m_dDBoxLength = DetectionLength +
+	m_dDBoxLength = Prm.MinDetectionBoxLength +
 		(m_pVehicle->Speed() / m_pVehicle->MaxSpeed()) *
-		DetectionLength;
+		Prm.MinDetectionBoxLength;
 
 	//tag all obstacles within range of the box for processing
 	m_pVehicle->GetWorld()->TagObstaclesWithinViewRange(m_pVehicle, m_dDBoxLength);
@@ -308,7 +325,7 @@ void SteeringBehavior::Render()
 	}
 
 
-	if (On(wander))
+	if (false/*On(wander)*/)
 	{
 		if (KEYDOWN('F')) { m_dWanderJitter += 1.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderJitter, 0.0f, 100.0f); }
 		if (KEYDOWN('V')) { m_dWanderJitter -= 1.0f*m_pVehicle->TimeElapsed(); Clamp(m_dWanderJitter, 0.0f, 100.0f); }
@@ -397,70 +414,70 @@ Vector2 SteeringBehavior::Calculate()
 
 	if (On(cohesion) || On(separation) || On(allignment))
 	{
-		m_pVehicle->GetWorld()->TagObstaclesWithinViewRange(m_pVehicle, m_dViewDistance);
+		m_pVehicle->GetWorld()->TagVehiclesWithinViewRange(m_pVehicle, m_dViewDistance);
 	}
 
     if (On(wall_avoidance))
     {
-        force = WallAvoidance(m_pVehicle->GetWorld()->Walls()) * 20;
+		force = WallAvoidance(m_pVehicle->GetWorld()->Walls()) * m_dWeightWallAvoidance;
         if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
     }
 
 	if (On(obstacle_avoidance))
 	{
-		force = ObstacleAvoidance(m_pVehicle->GetWorld()->Obstacles()) * 20;
+		force = ObstacleAvoidance(m_pVehicle->GetWorld()->Obstacles()) * m_dWeightObstacleAvoidance;
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(separation))
 	{
-		force = Separation(m_pVehicle->GetWorld()->Agents()) /** m_dWeightSeparation*/;
+		force = Separation(m_pVehicle->GetWorld()->Agents()) * m_dWeightSeparation;
 
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(allignment))
 	{
-		force = Alignment(m_pVehicle->GetWorld()->Agents())/* * m_dWeightAlignment*/;
+		force = Alignment(m_pVehicle->GetWorld()->Agents()) * m_dWeightAlignment;
 
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(cohesion))
 	{
-		force = Cohesion(m_pVehicle->GetWorld()->Agents()) /** m_dWeightCohesion*/;
+		force = Cohesion(m_pVehicle->GetWorld()->Agents()) * m_dWeightCohesion;
 
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(seek))
 	{
-		force = Seek(m_pVehicle->GetWorld()->Crosshair()) * 1; //* m_dWeightSeek;
+		force = Seek(m_pVehicle->GetWorld()->Crosshair()) * m_dWeightSeek;
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(arrive))
 	{
-		force = Arrive(m_pVehicle->GetWorld()->Crosshair()) * 1;
+		force = Arrive(m_pVehicle->GetWorld()->Crosshair()) * m_dWeightArrive;
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(wander))
 	{
-		force = Wander() * 1;
+		force = Wander() * m_dWeightWander;
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(hide))
 	{
-		force = Hide(m_pTargetAgent1, m_pVehicle->GetWorld()->Obstacles());
+		force = Hide(m_pTargetAgent1, m_pVehicle->GetWorld()->Obstacles()) * m_dWeightHide;
 
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
 
 	if (On(follow_path))
 	{
-		force = FollowPath();
+		force = FollowPath() * m_dWeightFollowPath;
 
 		if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
 	}
@@ -604,8 +621,8 @@ Vector2 SteeringBehavior::Cohesion(const std::vector<Vehicle*>& neighbors)
 		//make sure *this* agent isn't included in the calculations and that
 		//the agent being examined is close enough ***also make sure it doesn't
 		//include the evade target ***
-		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged() &&
-			(neighbors[a] != m_pTargetAgent1))
+		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged()/* &&
+			(neighbors[a] != m_pTargetAgent1)*/)
 		{
 			CenterOfMass += neighbors[a]->Pos();
 
@@ -637,8 +654,8 @@ Vector2 SteeringBehavior::Separation(const std::vector<Vehicle*>& neighbors)
 		//make sure this agent isn't included in the calculations and that
 		//the agent being examined is close enough. ***also make sure it doesn't
 		//include the evade target ***
-		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged() &&
-			(neighbors[a] != m_pTargetAgent1))
+		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged()/* &&
+			(neighbors[a] != m_pTargetAgent1)*/)
 		{
 			Vector2 ToAgent = m_pVehicle->Pos() - neighbors[a]->Pos();
 
@@ -666,8 +683,8 @@ Vector2 SteeringBehavior::Alignment(const std::vector<Vehicle*>& neighbors)
 		//make sure *this* agent isn't included in the calculations and that
 		//the agent being examined  is close enough ***also make sure it doesn't
 		//include any evade target ***
-		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged() &&
-			(neighbors[a] != m_pTargetAgent1))
+		if ((neighbors[a] != m_pVehicle) && neighbors[a]->IsTagged()/* &&
+			(neighbors[a] != m_pTargetAgent1)*/)
 		{
 			AverageHeading += neighbors[a]->Heading();
 
